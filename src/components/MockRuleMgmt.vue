@@ -200,9 +200,9 @@ export default {
   },
   methods: {
     queryMockRules: async function() {
-      let uri = this.server + "/api/mock/queryRule" + "";
+      let uri = this.server + "/api/mock/2.0/queryRule" + "";
 
-      let requestBody = { hostName: this.hostName, uri: this.requestUri , workMode: this.workMode};
+      let requestBody = { hostName: this.hostName, uri: this.requestUri ,pageNumber:1,pageSize : 1};
 
       let postresult = await this.axios.post(uri, requestBody);
 
@@ -250,8 +250,8 @@ export default {
     addOk: async function() {
       let uri;
 
-      if (!this.addRule.update) uri = this.server + "/api/mock/addRule" + "";
-      else uri = this.server + "/api/mock/updateRule" + "";
+      if (!this.addRule.update) uri = this.server + "/api/mock/2.0/addRule" + "";
+      else uri = this.server + "/api/mock/2.0/updateRule" + "";
 
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
 
@@ -270,7 +270,7 @@ export default {
       }
     },
     deleteOk: async function() {
-      let uri = this.server + "/api/mock/deleteRule" + "";
+      let uri = this.server + "/api/mock/2.0/deleteRule" + "";
       let postresult = await this.axios.post(uri, { id: this.addRule.id });
       if (postresult.data.success) {
         await this.queryMockRules();
