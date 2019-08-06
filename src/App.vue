@@ -6,16 +6,18 @@
 
 <script>
 import MockRuleMgmt from './components/MockRuleMgmt.vue'
+import noticeinformation from './components/noticeinformation.vue'
 
-import Vue from "vue";
-import vuetabs from "vue-nav-tabs";
-import "iview/dist/styles/iview.css";
-import iview from "iview";
-import axios from "axios";
-import VueAxios from "vue-axios";
+import Vue from "vue"
+import vuetabs from "vue-nav-tabs"
+import "iview/dist/styles/iview.css"
+import iview from "iview"
+import axios from "axios"
+import VueAxios from "vue-axios"
 
-Vue.use(VueAxios, axios);
-Vue.use(iview);
+Vue.use(VueAxios, axios)
+Vue.use(iview)
+Vue.component('noticeinformation',noticeinformation)
 
 
 

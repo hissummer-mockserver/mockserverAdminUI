@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Divider>Mock 规则管理</Divider>
     <Input v-model="hostName" placeholder="hostName: * 表示可以匹配所有hostName" style="width: 300px" />
     <Input v-model="requestUri" placeholder="uri: uri 以/为开头" style="width: 300px" />
     <Button type="primary" @click="queryMockRules()">查询</Button>
@@ -38,7 +39,7 @@
       <div>
         <span class="modalInputLabel">Host:</span>
         <Input
-          v-model="addRule.hostName"
+          v-model="addRule.host"
           placeholder="要添加的HostName,为空或者* 则表示会匹配所有HostName"
           style="width: 400px"
         />
@@ -73,7 +74,7 @@
     >
       <div>
         将删除规则:
-        [ hostName: {{addRule.hostName}} ]
+        [ hostName: {{addRule.host}} ]
         [ uri: {{addRule.uri}} ]
       </div>
     </Modal>
@@ -96,8 +97,9 @@ export default {
         { value: "UPSTREAM", label: "上游" }
       ],
       addRule: {
+        enable:true,
         id: null,
-        hostName: '*',
+        host: '*',
         uri: null,
         mockResponse: null,
         workMode: 'MOCK',
@@ -109,10 +111,10 @@ export default {
       columns: [
         {
           title: "id",
-          key: "_id",
-          render: (h, params) => {
-            return h("div", params.row._id.$oid);
-          }
+          key: "id",
+          // render: (h, params) => {
+          //   return h("div", params.row._id.$oid);
+          // }
         },
         {
           title: "hostName",
@@ -200,19 +202,26 @@ export default {
   },
   methods: {
     queryMockRules: async function() {
-      let uri = this.server + "/api/mock/2.0/queryRule" + "";
+      let uri = this.server + "/api/mock/2.0/queryRule" + ""
 
-      let requestBody = { hostName: this.hostName, uri: this.requestUri ,pageNumber:1,pageSize : 1};
+      let requestBody = { host: this.hostName, uri: this.requestUri , pageNumber:0,pageSize:20}
 
-      let postresult = await this.axios.post(uri, requestBody);
+      let postresult = await this.axios.post(uri, requestBody)
 
-      console.log(postresult.data.data);
-      this.data = postresult.data.data;
+      console.log(postresult.data.data)
+      if(postresult.data.data != null)
+      {
+        this.data = postresult.data.data.content
+      }
+      else{
+         this.data  = []
+      }
 
-      this.$refs.noticeinformation.clear();
+      this.$refs.noticeinformation.clear()
     },
 
     addMockRule: async function() {
+      this.addRule.id = null
       this.addRule.update = false;
       this.addRule.uri = null;
       this.addRule.mockResponse = null;
@@ -220,27 +229,28 @@ export default {
       this.addRuleModal = true;
     },
     deleteMockRule: async function(params) {
-      this.addRule.hostName = params.row.host;
+      this.addRule.host = params.row.host;
       this.addRule.uri = params.row.uri;
-      this.addRule.mockResponse= params.row.mockResponse;
-      console.log(params.row._id);
-      this.addRule.id = params.row._id.$oid;
+      this.addRule.mockResponse = params.row.mockResponse;
+      //console.log(params.row._id);
+      this.addRule.id = params.row.id;
       this.addRule.update = true;
       this.deleteRuleModal = true;
 
       //not supported
     },
     updateMockRule: async function(params) {
-      this.addRule.hostName = params.row.host;
+      this.addRule.host = params.row.host;
       this.addRule.uri = params.row.uri;
       this.addRule.mockResponse = params.row.mockResponse;
-      this.addRule.id = params.row._id.$oid;
+      this.addRule.id = params.row.id
       this.addRule.update = true;
       this.modalTitle = "修改Mock规则";
       this.addRuleModal = true;
     },
     copyMockRule: async function(params) {
-      this.addRule.hostName = params.row.host;
+      this.addRule.host = params.row.host;
+      this.addRule.id = null
       this.addRule.uri = params.row.uri;
       this.addRule.mockResponse = params.row.mockResponse;
       this.addRule.update = false;
