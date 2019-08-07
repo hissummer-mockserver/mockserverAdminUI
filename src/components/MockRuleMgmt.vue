@@ -1,16 +1,16 @@
 <template>
   <div>
     <Divider>Mock 规则管理</Divider>
-    <Input v-model="hostName" placeholder="hostName: * 表示可以匹配所有hostName" style="width: 300px" />
-    <Input v-model="requestUri" placeholder="uri: uri 以/为开头" style="width: 300px" />
-    <Button type="primary" @click="queryMockRules()">查询</Button>
-    <Button type="primary" @click="addMockRule()">添加</Button>
+    <Input class="input" v-model="hostName" placeholder="hostName: * 表示可以匹配所有hostName" style="width: 300px" />
+    <Input class="input" v-model="requestUri" placeholder="uri: uri 以/为开头" style="width: 300px" />
+    <Button class="button" type="primary" @click="queryMockRules()">查询</Button>
+    <Button class="button" type="primary" @click="addMockRule()">添加</Button>
     <noticeinformation ref="noticeinformation"></noticeinformation>
     <Divider orientation="left">Mock规则列表</Divider>
     <!--Mock 规则列表表格 -->
     <Table border :columns="columns" :data="data"></Table>
-
-    <Card :bordered="false">
+    <Page class="page" :total="mockRulesTotalSize" show-total show-sizer :page-size-opts="[10,20,30]" :page-size="10" @on-change="changePageNumber($event)"  @on-page-size-change="changePageSize($event)"/>
+    <Card :bordered="true">
       <p slot="title">mock匹配规则说明</p>
       <p>1. hostName和uri作为联合索引, 即同样的hostName和uri 只能添加一条</p>
       <p>2. hostName 为* , 即表示可以匹配所有的hostName.</p>
@@ -18,7 +18,7 @@
       <p></p>
       <p>
         示例如下:
-        有2条规则
+        若添加有2条规则
       </p>
       <p>第一条规则: hostName:* uri:/hello mockResponse: mock1</p>
       <p>第二条规则: hostName:testHostName uri:/hello mockResponse: mock2</p>
@@ -91,6 +91,9 @@ export default {
       server: "http://localhost:8081",
       hostName: "",
       requestUri: null,
+      mockRulesTotalSize:0,
+      pageSize:10,
+      pageNumber:1,
       modalTitle: "",
       workModes: [
         { value: "MOCK", label: "Mock" },
@@ -201,16 +204,26 @@ export default {
     };
   },
   methods: {
+    changePageSize: async function(size) {
+      this.pageSize = size
+      this.queryMockRules()
+    },
+    changePageNumber: async function(number){
+      this.pageNumber = number
+      this.queryMockRules()
+
+    },
     queryMockRules: async function() {
       let uri = this.server + "/api/mock/2.0/queryRule" + ""
 
-      let requestBody = { host: this.hostName, uri: this.requestUri , pageNumber:0,pageSize:20}
+      let requestBody = { host: this.hostName, uri: this.requestUri , pageNumber:this.pageNumber -1 ,pageSize:this.pageSize}
 
       let postresult = await this.axios.post(uri, requestBody)
 
       console.log(postresult.data.data)
       if(postresult.data.data != null)
       {
+        this.mockRulesTotalSize = postresult.data.data.totalElements
         this.data = postresult.data.data.content
       }
       else{
@@ -301,5 +314,12 @@ export default {
 }
 p {
   text-align: left;
+}
+.page{
+  margin:10px 10px 30px;
+}
+.input , .button{
+  
+  margin:0px 5px;
 }
 </style>
