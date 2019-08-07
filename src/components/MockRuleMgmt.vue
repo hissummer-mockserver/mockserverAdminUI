@@ -96,8 +96,9 @@ export default {
       pageNumber:1,
       modalTitle: "",
       workModes: [
-        { value: "MOCK", label: "Mock" },
-        { value: "UPSTREAM", label: "上游" }
+        { value: "MOCK", label: "Mock" }
+        /*,
+        { value: "UPSTREAM", label: "上游" }*/
       ],
       addRule: {
         enable:true,
