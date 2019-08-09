@@ -1,4 +1,10 @@
-# template
+# Hissummer Mockserver adminUi
+```
+The admin ui for the Mockserver
+```
+
+# Usually we build the adminUI and integrate with the mockserver.
+please check the readme for mockserver. https://github.com/hissummer-mockserver/mockserver
 
 ## Project setup
 ```
