@@ -6,10 +6,10 @@
     <Button class="button" type="primary" @click="queryMockRules()">查询</Button>
     <Button class="button" type="primary" @click="addMockRule()">添加</Button>
     <noticeinformation ref="noticeinformation"></noticeinformation>
-    <Divider orientation="left">Mock规则列表</Divider>
     <!--Mock 规则列表表格 -->
     <Table border :columns="columns" :data="data"></Table>
     <Page class="page" :total="mockRulesTotalSize" show-total show-sizer :page-size-opts="[10,20,30]" :page-size="10" @on-change="changePageNumber($event)"  @on-page-size-change="changePageSize($event)"/>
+    
     <Card :bordered="true">
       <p slot="title">mock匹配规则说明</p>
       <p>1. hostName和uri作为联合索引, 即同样的hostName和uri 只能添加一条</p>

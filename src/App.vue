@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <MockRuleMgmt/>
+    <div style="text-align:center;margin:20px;font-size:1.5em;"><a href="http://www.hissummer.com">www.hissummer.com</a></div>
   </div>
 </template>
 
