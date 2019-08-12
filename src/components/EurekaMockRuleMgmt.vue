@@ -1,15 +1,29 @@
 <template>
   <div>
     <Divider>Eureka Mock Rule 管理</Divider>
-    <Input class="input" v-model="hostName" placeholder="hostName: * 表示可以匹配所有hostName" style="width: 300px" />
-    <Input class="input" v-model="requestUri" placeholder="uri: uri 以/为开头" style="width: 300px" />
+    <Input
+      class="input"
+      v-model="eurekaServerAddress"
+      placeholder="Eureka Server Address"
+      style="width: 300px"
+    />
+    <Input class="input" v-model="serviceName" placeholder="Service Name" style="width: 300px" />
     <Button class="button" type="primary" @click="queryMockRules()">查询</Button>
     <Button class="button" type="primary" @click="addMockRule()">添加</Button>
     <noticeinformation ref="noticeinformation"></noticeinformation>
     <!--Mock 规则列表表格 -->
     <Table border :columns="columns" :data="data"></Table>
-    <Page class="page" :total="mockRulesTotalSize" show-total show-sizer :page-size-opts="[10,20,30]" :page-size="10" @on-change="changePageNumber($event)"  @on-page-size-change="changePageSize($event)"/>
-    
+    <Page
+      class="page"
+      :total="mockRulesTotalSize"
+      show-total
+      show-sizer
+      :page-size-opts="[10,20,30]"
+      :page-size="10"
+      @on-change="changePageNumber($event)"
+      @on-page-size-change="changePageSize($event)"
+    />
+
     <Card :bordered="true">
       <p slot="title">eureka mock规则说明</p>
     </Card>
@@ -22,31 +36,23 @@
       @on-cancel="cancel"
     >
       <div>
-        <span class="modalInputLabel">Host:</span>
-        <Input
-          v-model="addRule.host"
-          placeholder="要添加的HostName,为空或者* 则表示会匹配所有HostName"
-          style="width: 400px"
-        />
+        <span class="modalInputLabel">HostName:</span>
+        <Input v-model="addRule.hostName" placeholder="要添加的HostName,不能为空" style="width: 400px" />
       </div>
+
       <div>
-        <span class="modalInputLabel">工作模式:</span>
-        <Select v-model="addRule.workMode" style="width:200px">
-          <Option v-for="item in workModes" :value="item.value" :key="item.value">{{ item.label }}</Option>
-        </Select>
+        <span class="modalInputLabel">Port:</span>
+        <Input v-model="addRule.port" placeholder="端口号" style="width: 400px" />
       </div>
+
       <div>
-        <span class="modalInputLabel">Uri:</span>
-        <Input v-model="addRule.uri" placeholder="要匹配的Uri路径,不含协议地址和端口号,以/开头" style="width: 400px" />
+        <span class="modalInputLabel">serviceName:</span>
+        <Input v-model="addRule.serviceName" placeholder="serviceName" style="width: 400px" />
       </div>
+
       <div>
-        <span class="modalInputLabel">Mock报文:</span>
-        <Input
-          v-model="addRule.mockResponse"
-          type="textarea"
-          :rows="10"
-          placeholder="mock response body"
-        />
+        <span class="modalInputLabel">eurekaServer:</span>
+        <Input v-model="addRule.eurekaServer" placeholder="eurekaServer" style="width: 400px" />
       </div>
     </Modal>
 
@@ -74,24 +80,19 @@ export default {
     return {
       //server: "http://172.16.2.39:7280",
       server: "http://localhost:8081",
-      hostName: "",
-      requestUri: null,
-      mockRulesTotalSize:0,
-      pageSize:10,
-      pageNumber:1,
+      eurekaServerAddress: null,
+      serviceName: null,
+      mockRulesTotalSize: 0,
+      pageSize: 10,
+      pageNumber: 1,
       modalTitle: "",
-      workModes: [
-        { value: "MOCK", label: "Mock" }
-        /*,
-        { value: "UPSTREAM", label: "上游" }*/
-      ],
       addRule: {
-        enable:true,
+        enable: true,
         id: null,
-        host: '*',
-        uri: null,
-        mockResponse: null,
-        workMode: 'MOCK',
+        port: "",
+        hostName: "",
+        serviceName: "",
+        eurekaServer: "",
         update: false
       },
       update: null,
@@ -100,27 +101,28 @@ export default {
       columns: [
         {
           title: "id",
-          key: "id",
+          key: "id"
           // render: (h, params) => {
           //   return h("div", params.row._id.$oid);
           // }
         },
         {
+          title: "eurekaServer",
+          key: "eurekaServer"
+        },
+        {
           title: "hostName",
-          key: "host"
+          key: "hostName"
         },
         {
-          title: "uri",
-          key: "uri"
+          title: "port",
+          key: "port"
         },
         {
-          title: "工作模式",
-          key: "workMode"
+          title: "serviceName",
+          key: "serviceName"
         },
-        {
-          title: "mock报文",
-          key: "mockResponse"
-        },
+
         {
           title: "操作",
           key: "action",
@@ -191,67 +193,63 @@ export default {
   },
   methods: {
     changePageSize: async function(size) {
-      this.pageSize = size
-      this.queryMockRules()
+      this.pageSize = size;
+      this.queryMockRules();
     },
-    changePageNumber: async function(number){
-      this.pageNumber = number
-      this.queryMockRules()
-
+    changePageNumber: async function(number) {
+      this.pageNumber = number;
+      this.queryMockRules();
     },
     queryMockRules: async function() {
-      let uri = this.server + "/api/mock/2.0/queryRule" + ""
+      let uri = this.server + "/api/mock/2.0/queryEurekaRule" + "";
 
-      let requestBody = { host: this.hostName, uri: this.requestUri , pageNumber:this.pageNumber -1 ,pageSize:this.pageSize}
+      let requestBody = {
+        eurekaServer: this.eurekaServerAddress,
+        serviceName: this.serviceName,
+        pageNumber: this.pageNumber - 1,
+        pageSize: this.pageSize
+      };
 
-      let postresult = await this.axios.post(uri, requestBody)
+      let postresult = await this.axios.post(uri, requestBody);
 
-      console.log(postresult.data.data)
-      if(postresult.data.data != null)
-      {
-        this.mockRulesTotalSize = postresult.data.data.totalElements
-        this.data = postresult.data.data.content
+      console.log(postresult.data.data);
+      if (postresult.data.data != null) {
+        this.mockRulesTotalSize = postresult.data.data.totalElements;
+        this.data = postresult.data.data.content;
+      } else {
+        this.data = [];
       }
-      else{
-         this.data  = []
-      }
 
-      this.$refs.noticeinformation.clear()
+      this.$refs.noticeinformation.clear();
     },
 
     addMockRule: async function() {
-      this.addRule.id = null
+      this.addRule.id = null;
       this.addRule.update = false;
-      this.addRule.uri = null;
-      this.addRule.mockResponse = null;
+      this.addRule.port = null
+      this.addRule.hostName = null
+      this.addRule.serviceName = null
+      this.addRule.eurekaServer = null
       this.modalTitle = "添加Mock规则";
       this.addRuleModal = true;
     },
     deleteMockRule: async function(params) {
-      this.addRule.host = params.row.host;
-      this.addRule.uri = params.row.uri;
-      this.addRule.mockResponse = params.row.mockResponse;
+      this.addRule = params.row;
       //console.log(params.row._id);
-      this.addRule.id = params.row.id;
       this.addRule.update = true;
       this.deleteRuleModal = true;
-
       //not supported
     },
     updateMockRule: async function(params) {
-      this.addRule.host = params.row.host;
-      this.addRule.uri = params.row.uri;
-      this.addRule.mockResponse = params.row.mockResponse;
-      this.addRule.id = params.row.id
+      this.addRule = params.row;
       this.addRule.update = true;
       this.modalTitle = "修改Mock规则";
       this.addRuleModal = true;
     },
     copyMockRule: async function(params) {
-      this.addRule.host = params.row.host;
+      this.addRule = params.row;
       this.addRule.id = null
-      this.addRule.uri = params.row.uri;
-      this.addRule.mockResponse = params.row.mockResponse;
+      //console.log(params.row._id);
       this.addRule.update = false;
       this.modalTitle = "根据已有规则创建Mock规则";
       this.addRuleModal = true;
@@ -259,8 +257,9 @@ export default {
     addOk: async function() {
       let uri;
 
-      if (!this.addRule.update) uri = this.server + "/api/mock/2.0/addRule" + "";
-      else uri = this.server + "/api/mock/2.0/updateRule" + "";
+      if (!this.addRule.update)
+        uri = this.server + "/api/mock/2.0/addEurekaRule" + "";
+      else uri = this.server + "/api/mock/2.0/updateEurekaRule" + "";
 
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
 
@@ -279,7 +278,7 @@ export default {
       }
     },
     deleteOk: async function() {
-      let uri = this.server + "/api/mock/2.0/deleteRule" + "";
+      let uri = this.server + "/api/mock/2.0/deleteEurekaRule" + "";
       let postresult = await this.axios.post(uri, { id: this.addRule.id });
       if (postresult.data.success) {
         await this.queryMockRules();
@@ -301,11 +300,11 @@ export default {
 p {
   text-align: left;
 }
-.page{
-  margin:10px 10px 30px;
+.page {
+  margin: 10px 10px 30px;
 }
-.input , .button{
-  
-  margin:0px 5px;
+.input,
+.button {
+  margin: 0px 5px;
 }
 </style>
