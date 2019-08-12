@@ -1,12 +1,34 @@
 <template>
+<div class="header">Hissummer Mock Server</div>
   <div id="app">
-    <MockRuleMgmt/>
+          <Tabs type="card" v-model="activeTab" >
+        <TabPane
+          key="mockRule"
+          name="mockRule"
+          label="Http Mock Rule"
+          class="show_align"
+        >
+           <MockRuleMgmt/>
+        </TabPane>
+
+        <TabPane
+          key="eurekaMockRule"
+          name="eurekaMockRule"
+          label="Eureka Mock Rule"
+          class="show_align"
+        >
+           <EurekaMockRuleMgmt/>
+        </TabPane>
+
+      </Tabs>
+   
     <div style="text-align:center;margin:20px;font-size:1.5em;"><a href="http://www.hissummer.com">www.hissummer.com</a></div>
   </div>
 </template>
 
 <script>
 import MockRuleMgmt from './components/MockRuleMgmt.vue'
+import EurekaMockRuleMgmt from './components/EurekaMockRuleMgmt.vue'
 import noticeinformation from './components/noticeinformation.vue'
 
 import Vue from "vue"
@@ -25,7 +47,7 @@ Vue.component('noticeinformation',noticeinformation)
 export default {
   name: 'app',
   components: {
-	MockRuleMgmt
+	MockRuleMgmt,EurekaMockRuleMgmt
   }
 
 

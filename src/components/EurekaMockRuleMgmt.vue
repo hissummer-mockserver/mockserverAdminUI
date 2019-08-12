@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Divider>Http Mock Rule 管理</Divider>
+    <Divider>Eureka Mock Rule 管理</Divider>
     <Input class="input" v-model="hostName" placeholder="hostName: * 表示可以匹配所有hostName" style="width: 300px" />
     <Input class="input" v-model="requestUri" placeholder="uri: uri 以/为开头" style="width: 300px" />
     <Button class="button" type="primary" @click="queryMockRules()">查询</Button>
@@ -11,22 +11,7 @@
     <Page class="page" :total="mockRulesTotalSize" show-total show-sizer :page-size-opts="[10,20,30]" :page-size="10" @on-change="changePageNumber($event)"  @on-page-size-change="changePageSize($event)"/>
     
     <Card :bordered="true">
-      <p slot="title">http mock匹配规则说明</p>
-      <p>1. hostName和uri作为联合索引, 即同样的hostName和uri 只能添加一条</p>
-      <p>2. hostName 为* , 即表示可以匹配所有的hostName.</p>
-      <p>3. hostName(不为*) 和 uri如果 没有匹配到,会尝试匹配hostName为*的规则</p>
-      <p></p>
-      <p>
-        示例如下:
-        若添加有2条规则
-      </p>
-      <p>第一条规则: hostName:* uri:/hello mockResponse: mock1</p>
-      <p>第二条规则: hostName:testHostName uri:/hello mockResponse: mock2</p>
-
-      <p>当我访问 http://ip/hello 时(ip是通过ip地址访问mock server), 则会匹配第一条规则.</p>
-      <p>如果我访问者 http://testHostName/hello 时,会匹配到第二条规则. (testHostName 需要添加hosts 或者dns添加record)</p>
-      <p>再如果我访问 http://testanotherHostName/hello 时, 会尝试先匹配 hostName=testanotherHostName, uri=/hello 如果找不到则会寻找</p>
-      <p>hostName=testanotherHostName , uri=/ , 如果找不到则开始寻找 hostName=* , uri=/hello .</p>
+      <p slot="title">eureka mock规则说明</p>
     </Card>
 
     <Modal
