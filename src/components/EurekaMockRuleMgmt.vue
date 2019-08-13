@@ -122,6 +122,26 @@ export default {
           title: "serviceName",
           key: "serviceName"
         },
+        {
+          title:'Disable/Enable',
+          key:'enable',
+          render:(h,params)=>{
+
+            return h('i-switch',{
+              props:{
+                value: params.row.enable
+              },
+              on:{
+                'on-change':(status)=>{
+                  this.changeEnable(status,params)
+                }
+              }
+
+            },'')
+
+          }
+
+        },
 
         {
           title: "操作",
@@ -192,6 +212,25 @@ export default {
     };
   },
   methods: {
+    changeEnable:async function(status,params){
+      console.log(status)
+      this.addRule = params.row
+      this.addRule.update = true
+      if(params.row.enable)
+      {
+        this.addRule.enable = false
+      }
+      else{
+        this.addRule.enable = true
+      }
+      
+      let ret = await this.addOk()
+      
+      if(!ret){
+        params.row.enable = !status
+      }
+
+    },
     changePageSize: async function(size) {
       this.pageSize = size;
       this.queryMockRules();
@@ -262,20 +301,28 @@ export default {
       else uri = this.server + "/api/mock/2.0/updateEurekaRule" + "";
 
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
-
+      try{
       let postresult = await this.axios.post(uri, this.addRule);
 
-      console.log(postresult.data.data);
+      console.log(postresult);
 
       if (postresult.data.success) {
         await this.queryMockRules();
-        this.$refs.noticeinformation.showalert("success", "添加/修改成功");
+        this.$refs.noticeinformation.showalert("success", this.addRule.update?'修改':'添加' + "成功")
+        return true
       } else {
         this.$refs.noticeinformation.showalert(
           "error",
           "添加/修改失败,请确认参数是否填写正确 或者 同样的hostName和uri规则是否已经添加!"
-        );
+        )
+        return false
       }
+      }
+      catch(error){
+        return false
+
+      }
+
     },
     deleteOk: async function() {
       let uri = this.server + "/api/mock/2.0/deleteEurekaRule" + "";
