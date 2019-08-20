@@ -13,6 +13,9 @@ yarn install
 
 ### Compiles and hot-reloads for development
 ```
+yarn run serve will deploy the single apg app for develop, we neede vi App.vue , change the store.state.server to the real backend server address and modify the standlone value to be true.  
+```
+```
 yarn run serve
 ```
 
