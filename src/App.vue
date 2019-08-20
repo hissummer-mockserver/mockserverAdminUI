@@ -1,8 +1,8 @@
 <template>
 <div id="app">
-  <div class="header">Hissummer Mock Server</div>
+  <div class="header">MockServer Management</div>
   <div id="body">
-          <Tabs type="card" v-model="activeTab" >
+          <Tabs type="card" >
         <TabPane
           key="mockRule"
           name="mockRule"
@@ -24,7 +24,7 @@
       </Tabs>
    
    </div>
-    <div style="text-align:center;margin:20px;font-size:1.5em;"><a href="http://www.hissummer.com">www.hissummer.com</a></div>
+    <div style="text-align:center;margin:20px;font-size:1.5em;">2019 Mockserver Mgmt</div>
   
   </div>
 
@@ -36,20 +36,43 @@ import EurekaMockRuleMgmt from './components/EurekaMockRuleMgmt.vue'
 import noticeinformation from './components/noticeinformation.vue'
 
 import Vue from "vue"
-import vuetabs from "vue-nav-tabs"
+//import vuetabs from "vue-nav-tabs"
 import "iview/dist/styles/iview.css"
 import iview from "iview"
 import axios from "axios"
 import VueAxios from "vue-axios"
+import Vuex from "vuex"
 
 Vue.use(VueAxios, axios)
 Vue.use(iview)
 Vue.component('noticeinformation',noticeinformation)
+Vue.use(Vuex)
 
+const store = new Vuex.Store({
+  state: {
+    server: 'http://localhost:8081',
+    standalone:false
+  },
+  getters: {
+    getServer (state) {
+      
+      if(state.standalone)
+      {
+          return state.server
+      }
+      else{
+         return window.location.protocol+'//'+window.location.host
+
+      }
+      
+    }
+  }
+})
 
 
 export default {
   name: 'app',
+  store,
   components: {
 	MockRuleMgmt,EurekaMockRuleMgmt
   }

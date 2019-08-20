@@ -78,8 +78,7 @@ export default {
   },
   data() {
     return {
-      //server: "http://172.16.2.39:7280",
-      server: "http://localhost:8081",
+      server: this.$store.getters.getServer,
       eurekaServerAddress: null,
       serviceName: null,
       mockRulesTotalSize: 0,
