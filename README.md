@@ -3,8 +3,7 @@
 The admin ui for the Mockserver
 ```
 
-I would like build the adminUI and integrate with in the mockserver.
-please check the readme for mockserver. https://github.com/hissummer-mockserver/mockserver
+If you want to Build the mockserver adminUI and mockserver backend tegother then generated a standalone deployable war file, please check the readme for BuildStandaloneWar 'https://github.com/hissummer-mockserver/BuildStandaloneWar'. 
 
 ## Project setup
 ```
