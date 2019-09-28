@@ -288,7 +288,7 @@ export default {
       } else {
         this.$refs.noticeinformation.showalert(
           "error",
-          "添加/修改失败,请确认参数是否填写正确 或者 同样的hostName和uri规则是否已经添加!"
+          "添加/修改失败:"+postresult.data.message
         );
       }
     },
@@ -299,7 +299,7 @@ export default {
         await this.queryMockRules();
         this.$refs.noticeinformation.showalert("success", "删除成功");
       } else {
-        this.$refs.noticeinformation.showalert("error", "删除失败!");
+        this.$refs.noticeinformation.showalert("error", "删除失败:"+postresult.data.message);
       }
     },
     cancel: async function() {}
