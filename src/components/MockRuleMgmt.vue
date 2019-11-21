@@ -37,7 +37,7 @@
       @on-cancel="cancel"
     >
       <div>
-        <span class="modalInputLabel">Host:</span>
+        <span class="modalInputLabel">请求Host:</span>
         <Input
           v-model="addRule.host"
           placeholder="要添加的HostName,为空或者* 则表示会匹配所有HostName"
@@ -51,11 +51,22 @@
         </Select>
       </div>
       <div>
-        <span class="modalInputLabel">Uri:</span>
+        <span class="modalInputLabel">请求Uri:</span>
         <Input v-model="addRule.uri" placeholder="要匹配的Uri路径,不含协议地址和端口号,以/开头" style="width: 400px" />
       </div>
+
       <div>
-        <span class="modalInputLabel">Mock报文:</span>
+        <span class="modalInputLabel">响应Headers:</span>
+        <Input
+          v-model="addRule.responseHeaders"
+          type="textarea"
+          :rows="10"
+          placeholder="{'header1':'value1'}"
+        />
+      </div>
+
+      <div>
+        <span class="modalInputLabel">响应Mock报文:</span>
         <Input
           v-model="addRule.mockResponse"
           type="textarea"
@@ -74,13 +85,16 @@
     >
       <div>
         将删除规则:
-        [ hostName: {{addRule.host}} ]
-        [ uri: {{addRule.uri}} ]
+         hostName: {{addRule.host}} 
+         uri: {{addRule.uri}} 
       </div>
     </Modal>
   </div>
 </template>
 <script>
+
+var _ = require('lodash')
+
 export default {
   created: function() {
     this.queryMockRules();
@@ -106,7 +120,8 @@ export default {
         uri: null,
         mockResponse: null,
         workMode: 'MOCK',
-        update: false
+        update: false,
+        responseHeaders:null
       },
       update: null,
       addRuleModal: false,
@@ -129,16 +144,21 @@ export default {
         },
         {
           title: "工作模式",
+          width: 100,
           key: "workMode"
         },
         {
-          title: "mock报文",
+          title: "响应Header",
+          key: "responseHeaders"
+        },
+        {
+          title: "响应mock报文",
           key: "mockResponse"
         },
         {
           title: "操作",
           key: "action",
-          width: 300,
+          width: 200,
           align: "center",
           render: (h, params) => {
             return h("div", [
@@ -235,16 +255,17 @@ export default {
 
     addMockRule: async function() {
       this.addRule.id = null
-      this.addRule.update = false;
-      this.addRule.uri = null;
-      this.addRule.mockResponse = null;
-      this.modalTitle = "添加Mock规则";
-      this.addRuleModal = true;
+      this.addRule.update = false
+      this.addRule.uri = null
+      this.addRule.mockResponse = null
+      this.addRule.responseHeaders = null
+      this.modalTitle = "添加Mock规则"
+      this.addRuleModal = true
     },
     deleteMockRule: async function(params) {
       this.addRule.host = params.row.host;
       this.addRule.uri = params.row.uri;
-      this.addRule.mockResponse = params.row.mockResponse;
+      this.addRule.mockResponse = params.row.mockResponse
       //console.log(params.row._id);
       this.addRule.id = params.row.id;
       this.addRule.update = true;
@@ -257,6 +278,7 @@ export default {
       this.addRule.uri = params.row.uri;
       this.addRule.mockResponse = params.row.mockResponse;
       this.addRule.id = params.row.id
+      this.addRule.responseHeaders = params.row.responseHeaders==null?null:JSON.stringify(params.row.responseHeaders)
       this.addRule.update = true;
       this.modalTitle = "修改Mock规则";
       this.addRuleModal = true;
@@ -266,6 +288,7 @@ export default {
       this.addRule.id = null
       this.addRule.uri = params.row.uri;
       this.addRule.mockResponse = params.row.mockResponse;
+      this.addRule.responseHeaders = params.row.responseHeaders==null?null:JSON.stringify(params.row.responseHeaders)
       this.addRule.update = false;
       this.modalTitle = "根据已有规则创建Mock规则";
       this.addRuleModal = true;
@@ -277,8 +300,12 @@ export default {
       else uri = this.server + "/api/mock/2.0/updateRule" + "";
 
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
+    
+      let postBody = _.cloneDeep(this.addRule)
 
-      let postresult = await this.axios.post(uri, this.addRule);
+      postBody.responseHeaders = JSON.parse(postBody.responseHeaders)
+
+      let postresult = await this.axios.post(uri, postBody)
 
       console.log(postresult.data.data);
 

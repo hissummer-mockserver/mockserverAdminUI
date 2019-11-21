@@ -35,6 +35,7 @@ import MockRuleMgmt from './components/MockRuleMgmt.vue'
 import EurekaMockRuleMgmt from './components/EurekaMockRuleMgmt.vue'
 import noticeinformation from './components/noticeinformation.vue'
 
+
 import Vue from "vue"
 //import vuetabs from "vue-nav-tabs"
 import "iview/dist/styles/iview.css"
@@ -43,10 +44,15 @@ import axios from "axios"
 import VueAxios from "vue-axios"
 import Vuex from "vuex"
 
+
+
+//import clonedeep from "lodash.clonedeep"
+
 Vue.use(VueAxios, axios)
 Vue.use(iview)
 Vue.component('noticeinformation',noticeinformation)
 Vue.use(Vuex)
+
 
 const store = new Vuex.Store({
   state: {

@@ -12,6 +12,7 @@
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
     "core-js": "^2.6.5",
     "iview": "^3.4.2",
+    "lodash.clonedeep": "^4.5.0",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.4",
     "vue-nav-tabs": "^0.5.7",
