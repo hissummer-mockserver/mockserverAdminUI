@@ -93,7 +93,9 @@
 </template>
 <script>
 
-var _ = require('lodash')
+//var _ = require('lodash')
+
+import lodash from 'lodash'
 
 export default {
   created: function() {
@@ -301,7 +303,7 @@ export default {
 
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
     
-      let postBody = _.cloneDeep(this.addRule)
+      let postBody = lodash.cloneDeep(this.addRule)
 
       postBody.responseHeaders = JSON.parse(postBody.responseHeaders)
 
