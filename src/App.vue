@@ -1,15 +1,10 @@
 <template>
-<div id="app">
-  <div class="header">MockServer Management</div>
-  <div id="body">
-          <Tabs type="card" >
-        <TabPane
-          key="mockRule"
-          name="mockRule"
-          label="Http Mock Rule"
-          class="show_align"
-        >
-           <MockRuleMgmt/>
+  <div id="app">
+    <div class="header">MockServer Management</div>
+    <div id="body">
+      <Tabs type="card">
+        <TabPane key="mockRule" name="mockRule" label="Http Mock Rule" class="show_align">
+          <MockRuleMgmt />
         </TabPane>
 
         <TabPane
@@ -18,98 +13,87 @@
           label="Eureka Mock Rule"
           class="show_align"
         >
-           <EurekaMockRuleMgmt/>
+          <EurekaMockRuleMgmt />
         </TabPane>
-
       </Tabs>
-   
-   </div>
-    <div style="text-align:center;margin:20px;font-size:1.5em;"><a href="https://mockserver.hissummer.com" target="_blank">2019 Hissummer Mockserver</a></div>
-  
-  </div>
+    </div>
 
+    <Divider></Divider>
+    <div style="text-align:center;margin:20px;font-size:1.5em;">
+      <a href="https://mockserver.hissummer.com" target="_blank">2019 Hissummer Mockserver</a> |
+      <a href="https://mockserver.hissummer.com/" target="_blank">使用帮助</a>
+    </div>
+  </div>
 </template>
 
 <script>
-import MockRuleMgmt from './components/MockRuleMgmt.vue'
-import EurekaMockRuleMgmt from './components/EurekaMockRuleMgmt.vue'
-import noticeinformation from './components/noticeinformation.vue'
+import MockRuleMgmt from "./components/MockRuleMgmt.vue";
+import EurekaMockRuleMgmt from "./components/EurekaMockRuleMgmt.vue";
+import noticeinformation from "./components/noticeinformation.vue";
 
-
-import Vue from "vue"
+import Vue from "vue";
 //import vuetabs from "vue-nav-tabs"
-import "iview/dist/styles/iview.css"
-import iview from "iview"
-import axios from "axios"
-import VueAxios from "vue-axios"
-import Vuex from "vuex"
-
-
+import "iview/dist/styles/iview.css";
+import iview from "iview";
+import axios from "axios";
+import VueAxios from "vue-axios";
+import Vuex from "vuex";
 
 //import clonedeep from "lodash.clonedeep"
 
-Vue.use(VueAxios, axios)
-Vue.use(iview)
-Vue.component('noticeinformation',noticeinformation)
-Vue.use(Vuex)
-
+Vue.use(VueAxios, axios);
+Vue.use(iview);
+Vue.component("noticeinformation", noticeinformation);
+Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    server: 'http://localhost:8081',
-    standalone:false
+    server: "http://localhost:8081",
+    standalone: false
   },
   getters: {
-    getServer (state) {
-      
-      if(state.standalone)
-      {
-          return state.server
+    getServer(state) {
+      if (state.standalone) {
+        return state.server;
+      } else {
+        return window.location.protocol + "//" + window.location.host;
       }
-      else{
-         return window.location.protocol+'//'+window.location.host
-
-      }
-      
     }
   }
-})
-
+});
 
 export default {
-  name: 'app',
+  name: "app",
   store,
   components: {
-	MockRuleMgmt,EurekaMockRuleMgmt
+    MockRuleMgmt,
+    EurekaMockRuleMgmt
   }
-
-
-}
+};
 </script>
 
 <style scope>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
 }
 
-#body{
-  margin:0px 20px;
+#body {
+  margin: 0px 20px;
 }
 
-.header{
-      height: 60px;
-    /* text-align: center; */
-    /* vertical-align: middle; */
-    padding: 20px;
-    background-color: #3e8bf0;
-    color: white;
-    font-weight: 1000;
-    font-size: 1.5em;
-    margin-bottom: 10px;
+.header {
+  height: 60px;
+  /* text-align: center; */
+  /* vertical-align: middle; */
+  padding: 20px;
+  background-color: #3e8bf0;
+  color: white;
+  font-weight: 1000;
+  font-size: 1.5em;
+  margin-bottom: 10px;
 }
-
 </style>

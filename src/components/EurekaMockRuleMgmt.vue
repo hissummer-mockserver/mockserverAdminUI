@@ -24,10 +24,6 @@
       @on-page-size-change="changePageSize($event)"
     />
 
-    <Card :bordered="true">
-      <p slot="title">eureka mock规则说明</p>
-    </Card>
-
     <Modal
       width="600px"
       v-model="addRuleModal"

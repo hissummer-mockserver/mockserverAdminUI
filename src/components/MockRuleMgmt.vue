@@ -1,33 +1,28 @@
 <template>
   <div>
     <Divider>Http Mock Rule 管理</Divider>
-    <Input class="input" v-model="hostName" placeholder="hostName: * 表示可以匹配所有hostName" style="width: 300px" />
+    <Input
+      class="input"
+      v-model="hostName"
+      placeholder="hostName: * 表示可以匹配所有hostName"
+      style="width: 300px"
+    />
     <Input class="input" v-model="requestUri" placeholder="uri: uri 以/为开头" style="width: 300px" />
     <Button class="button" type="primary" @click="queryMockRules()">查询</Button>
     <Button class="button" type="primary" @click="addMockRule()">添加</Button>
     <noticeinformation ref="noticeinformation"></noticeinformation>
     <!--Mock 规则列表表格 -->
     <Table border :columns="columns" :data="data"></Table>
-    <Page class="page" :total="mockRulesTotalSize" show-total show-sizer :page-size-opts="[10,20,30]" :page-size="10" @on-change="changePageNumber($event)"  @on-page-size-change="changePageSize($event)"/>
-    
-    <Card :bordered="true">
-      <p slot="title">http mock匹配规则说明</p>
-      <p>1. hostName和uri作为联合索引, 即同样的hostName和uri 只能添加一条</p>
-      <p>2. hostName 为* , 即表示可以匹配所有的hostName.</p>
-      <p>3. hostName(不为*) 和 uri如果 没有匹配到,会尝试匹配hostName为*的规则</p>
-      <p></p>
-      <p>
-        示例如下:
-        若添加有2条规则
-      </p>
-      <p>第一条规则: hostName:* uri:/hello mockResponse: mock1</p>
-      <p>第二条规则: hostName:testHostName uri:/hello mockResponse: mock2</p>
-
-      <p>当我访问 http://ip/hello 时(ip是通过ip地址访问mock server), 则会匹配第一条规则.</p>
-      <p>如果我访问者 http://testHostName/hello 时,会匹配到第二条规则. (testHostName 需要添加hosts 或者dns添加record)</p>
-      <p>再如果我访问 http://testanotherHostName/hello 时, 会尝试先匹配 hostName=testanotherHostName, uri=/hello 如果找不到则会寻找</p>
-      <p>hostName=testanotherHostName , uri=/ , 如果找不到则开始寻找 hostName=* , uri=/hello .</p>
-    </Card>
+    <Page
+      class="page"
+      :total="mockRulesTotalSize"
+      show-total
+      show-sizer
+      :page-size-opts="[10,20,30]"
+      :page-size="10"
+      @on-change="changePageNumber($event)"
+      @on-page-size-change="changePageSize($event)"
+    />
 
     <Modal
       width="600px"
@@ -85,17 +80,16 @@
     >
       <div>
         将删除规则:
-         hostName: {{addRule.host}} 
-         uri: {{addRule.uri}} 
+        hostName: {{addRule.host}}
+        uri: {{addRule.uri}}
       </div>
     </Modal>
   </div>
 </template>
 <script>
-
 //var _ = require('lodash')
 
-import lodash from 'lodash'
+import lodash from "lodash";
 
 export default {
   created: function() {
@@ -106,9 +100,9 @@ export default {
       server: this.$store.getters.getServer,
       hostName: "",
       requestUri: null,
-      mockRulesTotalSize:0,
-      pageSize:10,
-      pageNumber:1,
+      mockRulesTotalSize: 0,
+      pageSize: 10,
+      pageNumber: 1,
       modalTitle: "",
       workModes: [
         { value: "MOCK", label: "Mock" }
@@ -116,14 +110,14 @@ export default {
         { value: "UPSTREAM", label: "上游" }*/
       ],
       addRule: {
-        enable:true,
+        enable: true,
         id: null,
-        host: '*',
+        host: "*",
         uri: null,
         mockResponse: null,
-        workMode: 'MOCK',
+        workMode: "MOCK",
         update: false,
-        responseHeaders:null
+        responseHeaders: null
       },
       update: null,
       addRuleModal: false,
@@ -131,7 +125,7 @@ export default {
       columns: [
         {
           title: "id",
-          key: "id",
+          key: "id"
           // render: (h, params) => {
           //   return h("div", params.row._id.$oid);
           // }
@@ -155,7 +149,23 @@ export default {
         },
         {
           title: "响应mock报文",
-          key: "mockResponse"
+          key: "mockResponse",
+          render: (h, params) => {
+            return h(
+              "Tooltip",
+              {
+                props: { theme:'light',placement: "left", 'max-width':'600',content: params.row.mockResponse }
+              },
+              [
+                h(
+                  "div",
+                  params.row.mockResponse.length > 128
+                    ? this.showless(params.row.mockResponse) + " ...更多 "
+                    : params.row.mockResponse
+                )
+              ]
+            );
+          }
         },
         {
           title: "操作",
@@ -226,48 +236,54 @@ export default {
     };
   },
   methods: {
-    changePageSize: async function(size) {
-      this.pageSize = size
-      this.queryMockRules()
+    showless: function(mockResponse) {
+      return mockResponse.substring(0, 128);
     },
-    changePageNumber: async function(number){
-      this.pageNumber = number
-      this.queryMockRules()
 
+    changePageSize: async function(size) {
+      this.pageSize = size;
+      this.queryMockRules();
+    },
+    changePageNumber: async function(number) {
+      this.pageNumber = number;
+      this.queryMockRules();
     },
     queryMockRules: async function() {
-      let uri = this.server + "/api/mock/2.0/queryRule" + ""
+      let uri = this.server + "/api/mock/2.0/queryRule" + "";
 
-      let requestBody = { host: this.hostName, uri: this.requestUri , pageNumber:this.pageNumber -1 ,pageSize:this.pageSize}
+      let requestBody = {
+        host: this.hostName,
+        uri: this.requestUri,
+        pageNumber: this.pageNumber - 1,
+        pageSize: this.pageSize
+      };
 
-      let postresult = await this.axios.post(uri, requestBody)
+      let postresult = await this.axios.post(uri, requestBody);
 
-      console.log(postresult.data.data)
-      if(postresult.data.data != null)
-      {
-        this.mockRulesTotalSize = postresult.data.data.totalElements
-        this.data = postresult.data.data.content
+      console.log(postresult.data.data);
+      if (postresult.data.data != null) {
+        this.mockRulesTotalSize = postresult.data.data.totalElements;
+        this.data = postresult.data.data.content;
+      } else {
+        this.data = [];
       }
-      else{
-         this.data  = []
-      }
 
-      this.$refs.noticeinformation.clear()
+      this.$refs.noticeinformation.clear();
     },
 
     addMockRule: async function() {
-      this.addRule.id = null
-      this.addRule.update = false
-      this.addRule.uri = null
-      this.addRule.mockResponse = null
-      this.addRule.responseHeaders = null
-      this.modalTitle = "添加Mock规则"
-      this.addRuleModal = true
+      this.addRule.id = null;
+      this.addRule.update = false;
+      this.addRule.uri = null;
+      this.addRule.mockResponse = null;
+      this.addRule.responseHeaders = null;
+      this.modalTitle = "添加Mock规则";
+      this.addRuleModal = true;
     },
     deleteMockRule: async function(params) {
       this.addRule.host = params.row.host;
       this.addRule.uri = params.row.uri;
-      this.addRule.mockResponse = params.row.mockResponse
+      this.addRule.mockResponse = params.row.mockResponse;
       //console.log(params.row._id);
       this.addRule.id = params.row.id;
       this.addRule.update = true;
@@ -279,18 +295,24 @@ export default {
       this.addRule.host = params.row.host;
       this.addRule.uri = params.row.uri;
       this.addRule.mockResponse = params.row.mockResponse;
-      this.addRule.id = params.row.id
-      this.addRule.responseHeaders = params.row.responseHeaders==null?null:JSON.stringify(params.row.responseHeaders)
+      this.addRule.id = params.row.id;
+      this.addRule.responseHeaders =
+        params.row.responseHeaders == null
+          ? null
+          : JSON.stringify(params.row.responseHeaders);
       this.addRule.update = true;
       this.modalTitle = "修改Mock规则";
       this.addRuleModal = true;
     },
     copyMockRule: async function(params) {
       this.addRule.host = params.row.host;
-      this.addRule.id = null
+      this.addRule.id = null;
       this.addRule.uri = params.row.uri;
       this.addRule.mockResponse = params.row.mockResponse;
-      this.addRule.responseHeaders = params.row.responseHeaders==null?null:JSON.stringify(params.row.responseHeaders)
+      this.addRule.responseHeaders =
+        params.row.responseHeaders == null
+          ? null
+          : JSON.stringify(params.row.responseHeaders);
       this.addRule.update = false;
       this.modalTitle = "根据已有规则创建Mock规则";
       this.addRuleModal = true;
@@ -298,16 +320,17 @@ export default {
     addOk: async function() {
       let uri;
 
-      if (!this.addRule.update) uri = this.server + "/api/mock/2.0/addRule" + "";
+      if (!this.addRule.update)
+        uri = this.server + "/api/mock/2.0/addRule" + "";
       else uri = this.server + "/api/mock/2.0/updateRule" + "";
 
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
-    
-      let postBody = lodash.cloneDeep(this.addRule)
 
-      postBody.responseHeaders = JSON.parse(postBody.responseHeaders)
+      let postBody = lodash.cloneDeep(this.addRule);
 
-      let postresult = await this.axios.post(uri, postBody)
+      postBody.responseHeaders = JSON.parse(postBody.responseHeaders);
+
+      let postresult = await this.axios.post(uri, postBody);
 
       console.log(postresult.data.data);
 
@@ -317,7 +340,7 @@ export default {
       } else {
         this.$refs.noticeinformation.showalert(
           "error",
-          "添加/修改失败:"+postresult.data.message
+          "添加/修改失败:" + postresult.data.message
         );
       }
     },
@@ -328,7 +351,10 @@ export default {
         await this.queryMockRules();
         this.$refs.noticeinformation.showalert("success", "删除成功");
       } else {
-        this.$refs.noticeinformation.showalert("error", "删除失败:"+postresult.data.message);
+        this.$refs.noticeinformation.showalert(
+          "error",
+          "删除失败:" + postresult.data.message
+        );
       }
     },
     cancel: async function() {}
@@ -344,11 +370,11 @@ export default {
 p {
   text-align: left;
 }
-.page{
-  margin:10px 10px 30px;
+.page {
+  margin: 10px 10px 30px;
 }
-.input , .button{
-  
-  margin:0px 5px;
+.input,
+.button {
+  margin: 0px 5px;
 }
 </style>
