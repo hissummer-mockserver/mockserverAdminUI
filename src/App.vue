@@ -17,7 +17,6 @@
         </TabPane>
       </Tabs>
     </div>
-
     <Divider></Divider>
     <div style="text-align:center;margin:20px;font-size:1.5em;">
       <a href="https://mockserver.hissummer.com" target="_blank">2019 Hissummer Mockserver</a> |
@@ -95,5 +94,12 @@ export default {
   font-weight: 1000;
   font-size: 1.5em;
   margin-bottom: 10px;
+}
+</style>
+
+<style >
+
+.ivu-tabs-card{
+      padding-bottom: 78px;
 }
 </style>
