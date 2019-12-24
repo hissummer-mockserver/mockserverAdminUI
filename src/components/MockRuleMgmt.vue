@@ -154,13 +154,13 @@ export default {
             return h(
               "Tooltip",
               {
-                props: { theme:'light',placement: "left", 'max-width':'600',content: params.row.mockResponse }
+                props: {transfer:true,theme:'light',placement: "left-start", 'max-width':'500',content: params.row.mockResponse }
               },
               [
                 h(
                   "div",
                   params.row.mockResponse.length > 128
-                    ? this.showless(params.row.mockResponse) + " ...更多 "
+                    ? this.showless(params.row.mockResponse) + " ...更多内容"
                     : params.row.mockResponse
                 )
               ]
@@ -376,5 +376,15 @@ p {
 .input,
 .button {
   margin: 0px 5px;
+}
+
+</style>
+
+<style>
+
+.ivu-tooltip-inner{
+  word-break:break-all;
+  overflow: auto;
+  max-height: 600px;
 }
 </style>

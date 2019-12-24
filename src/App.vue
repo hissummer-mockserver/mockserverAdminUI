@@ -48,7 +48,7 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    server: "http://localhost:8081",
+    server: "http://172.16.2.39:8082",
     standalone: false
   },
   getters: {
