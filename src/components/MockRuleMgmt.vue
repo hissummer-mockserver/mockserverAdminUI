@@ -363,7 +363,7 @@ export default {
 </script>
 <style scoped>
 .modalInputLabel {
-  width: 80px;
+  width: 110px;
   padding: 10px;
   display: inline-block;
 }

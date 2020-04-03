@@ -32,7 +32,26 @@
       @on-cancel="cancel"
     >
       <div>
-        <span class="modalInputLabel">HostName:</span>
+        <span class="modalInputLabel">Eureka版本:</span>
+        <Select v-model="addRule.version" style="width:200px">
+          <Option v-for="item in eurekaVersions" :value="item.value" :key="item.value">{{ item.label }}</Option>
+        </Select>
+      </div>
+
+      <div>
+        <span class="modalInputLabel">是否启用:</span>
+         <i-switch v-model="addRule.enable" @on-change="switchEnable" />
+      </div>
+
+
+      <div>
+        <span class="modalInputLabel">ServiceName:</span>
+        <Input v-model="addRule.serviceName" placeholder="serviceName" style="width: 400px" />
+      </div>
+
+
+      <div>
+        <span class="modalInputLabel">Ip Address/Domain Name:</span>
         <Input v-model="addRule.hostName" placeholder="要添加的HostName,不能为空" style="width: 400px" />
       </div>
 
@@ -42,12 +61,7 @@
       </div>
 
       <div>
-        <span class="modalInputLabel">serviceName:</span>
-        <Input v-model="addRule.serviceName" placeholder="serviceName" style="width: 400px" />
-      </div>
-
-      <div>
-        <span class="modalInputLabel">eurekaServer:</span>
+        <span class="modalInputLabel">Eureka Server:</span>
         <Input v-model="addRule.eurekaServer" placeholder="eurekaServer" style="width: 400px" />
       </div>
     </Modal>
@@ -80,15 +94,19 @@ export default {
       mockRulesTotalSize: 0,
       pageSize: 10,
       pageNumber: 1,
-      modalTitle: "",
+      modalTitle: '',
+      eurekaVersions: [
+        { value: "v1.0", label: "v1.0" }
+      ],
       addRule: {
         enable: true,
         id: null,
-        port: "",
-        hostName: "",
-        serviceName: "",
-        eurekaServer: "",
-        update: false
+        port: '',
+        hostName: '',
+        serviceName: '',
+        eurekaServer: '',
+        update: false,
+        version:'v1.0'
       },
       update: null,
       addRuleModal: false,
@@ -104,6 +122,10 @@ export default {
         {
           title: "eurekaServer",
           key: "eurekaServer"
+        },
+          {
+          title: "eureka version",
+          key: "version"
         },
         {
           title: "hostName",
@@ -207,6 +229,13 @@ export default {
     };
   },
   methods: {
+
+    switchEnable: function(status){
+
+      this.addRule.enable = status 
+
+    },
+
     changeEnable:async function(status,params){
       console.log(status)
       this.addRule = params.row
@@ -235,7 +264,7 @@ export default {
       this.queryMockRules();
     },
     queryMockRules: async function() {
-      let uri = this.server + "/api/mock/2.0/queryEurekaRule" + "";
+      let uri = this.server + "/api/mock/2.0/queryEurekaRule" + '';
 
       let requestBody = {
         eurekaServer: this.eurekaServerAddress,
@@ -292,8 +321,8 @@ export default {
       let uri;
 
       if (!this.addRule.update)
-        uri = this.server + "/api/mock/2.0/addEurekaRule" + "";
-      else uri = this.server + "/api/mock/2.0/updateEurekaRule" + "";
+        uri = this.server + "/api/mock/2.0/addEurekaRule" + '';
+      else uri = this.server + "/api/mock/2.0/updateEurekaRule" + '';
 
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
       try{
@@ -320,7 +349,7 @@ export default {
 
     },
     deleteOk: async function() {
-      let uri = this.server + "/api/mock/2.0/deleteEurekaRule" + "";
+      let uri = this.server + "/api/mock/2.0/deleteEurekaRule" + '';
       let postresult = await this.axios.post(uri, { id: this.addRule.id });
       if (postresult.data.success) {
         await this.queryMockRules();
@@ -335,7 +364,7 @@ export default {
 </script>
 <style scoped>
 .modalInputLabel {
-  width: 80px;
+  width:110px;
   padding: 10px;
   display: inline-block;
 }
