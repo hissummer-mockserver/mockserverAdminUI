@@ -99,7 +99,7 @@ export default {
         { value: "v1.0", label: "v1.0" }
       ],
       addRule: {
-        enable: true,
+        enable: false,
         id: null,
         port: '',
         hostName: '',
