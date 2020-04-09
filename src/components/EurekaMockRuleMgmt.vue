@@ -31,12 +31,12 @@
       @on-ok="addOk"
       @on-cancel="cancel"
     >
-      <div>
+      <!-- <div>
         <span class="modalInputLabel">Eureka版本:</span>
         <Select v-model="addRule.version" style="width:200px">
           <Option v-for="item in eurekaVersions" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
-      </div>
+      </div> -->
 
       <div>
         <span class="modalInputLabel">是否启用:</span>
@@ -95,9 +95,10 @@ export default {
       pageSize: 10,
       pageNumber: 1,
       modalTitle: '',
-      eurekaVersions: [
-        { value: "v1.0", label: "v1.0" }
-      ],
+      // eurekaVersions: [
+      //   { value: "v1.0", label: "v1.0" }
+      // ]
+      ,
       addRule: {
         enable: false,
         id: null,
@@ -105,8 +106,9 @@ export default {
         hostName: '',
         serviceName: '',
         eurekaServer: '',
-        update: false,
-        version:'v1.0'
+        update: false
+        // ,
+        // version:'v1.0'
       },
       update: null,
       addRuleModal: false,
@@ -123,10 +125,10 @@ export default {
           title: "eurekaServer",
           key: "eurekaServer"
         },
-          {
-          title: "eureka version",
-          key: "version"
-        },
+        //   {
+        //   title: "eureka version",
+        //   key: "version"
+        // },
         {
           title: "hostName",
           key: "hostName"
