@@ -98,7 +98,7 @@ export default {
       // eurekaVersions: [
       //   { value: "v1.0", label: "v1.0" }
       // ]
-      ,
+      //,
       addRule: {
         enable: false,
         id: null,
