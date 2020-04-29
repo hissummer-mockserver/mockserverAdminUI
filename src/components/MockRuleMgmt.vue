@@ -8,7 +8,7 @@
       style="width: 300px"
     />
     <Input class="input" v-model="requestUri" placeholder="uri: uri 以/为开头" style="width: 300px" />
-    <Button class="button" type="primary" @click="queryMockRules()">查询</Button>
+    <Button class="button" type="primary" @click="queryMockRules(1)">查询</Button>
     <Button class="button" type="primary" @click="addMockRule()">添加</Button>
     <noticeinformation ref="noticeinformation"></noticeinformation>
     <!--Mock 规则列表表格 -->
@@ -24,6 +24,7 @@
       @on-page-size-change="changePageSize($event)"
     />
 
+    <!-- start of the add modal -->
     <Modal
       width="600px"
       v-model="addRuleModal"
@@ -41,16 +42,41 @@
       </div>
       <div>
         <span class="modalInputLabel">工作模式:</span>
-        <Select v-model="addRule.workMode" style="width:200px">
-          <Option v-for="item in workModes" :value="item.value" :key="item.value">{{ item.label }}</Option>
+        <Select v-model="addRule.workMode" style="width:200px" @on-change="changeWorkMode($event)">
+          <Option v-for="item in workModes" :value="item.value" :key="item.value" >{{ item.label }}</Option>
         </Select>
+        <div v-if="upstreamMode">
+        <div class="nextedForm">
+          <span class="modalInputLabel">上游服务: </span>
+
+          <Input
+            v-model="addRule.upstreams.nodes[0].protocol"
+            placeholder="http"
+            style="width:50px"
+          /> ://
+          <Input
+            v-model="addRule.upstreams.nodes[0].address"
+            placeholder="localhost:8081"
+            style="width:150px"
+          />
+          <Input
+            v-model="addRule.upstreams.nodes[0].uri"
+            placeholder="/testuri"
+            style="width:150px"
+          />
+
+        </div>
+
+        </div> 
+
       </div>
+
       <div>
         <span class="modalInputLabel">请求Uri:</span>
         <Input v-model="addRule.uri" placeholder="要匹配的Uri路径,不含协议地址和端口号,以/开头" style="width: 400px" />
       </div>
 
-      <div>
+      <div v-if="responseHeaders">
         <span class="modalInputLabel">响应Headers:</span>
         <Input
           v-model="addRule.responseHeaders"
@@ -60,7 +86,7 @@
         />
       </div>
 
-      <div>
+      <div  v-if="responseBody">
         <span class="modalInputLabel">响应Mock报文:</span>
         <Input
           v-model="addRule.mockResponse"
@@ -71,6 +97,9 @@
       </div>
     </Modal>
 
+    <!-- end of the add modal -->
+
+    <!-- start of the delete modal -->
     <Modal
       width="600px"
       v-model="deleteRuleModal"
@@ -84,6 +113,9 @@
         uri: {{addRule.uri}}
       </div>
     </Modal>
+
+    <!-- end of the delete modal -->
+
   </div>
 </template>
 <script>
@@ -105,10 +137,12 @@ export default {
       pageNumber: 1,
       modalTitle: "",
       workModes: [
-        { value: "MOCK", label: "Mock" }
-        /*,
-        { value: "UPSTREAM", label: "上游" }*/
+        { value: "MOCK", label: "Mock" },
+        { value: "UPSTREAM", label: "Upstream" }
       ],
+      upstreamMode:false,
+      responseHeaders:true,
+      responseBody:true,
       addRule: {
         enable: true,
         id: null,
@@ -116,6 +150,7 @@ export default {
         uri: null,
         mockResponse: null,
         workMode: "MOCK",
+        upstreams:{nodes:[{protocol:'',address:'',requestUri:''}]},
         update: false,
         responseHeaders: null
       },
@@ -154,12 +189,12 @@ export default {
             return h(
               "Tooltip",
               {
-                props: {transfer:true,theme:'light',placement: "left-start", 'max-width':'500',content: params.row.mockResponse }
+                props: {transfer:true,theme:'light',placement: "left-start", 'max-width':'500',content: params.row.mockResponse == null ? "": params.row.mockResponse}
               },
               [
                 h(
                   "div",
-                  params.row.mockResponse.length > 128
+                   params.row.mockResponse != null && params.row.mockResponse.length > 128
                     ? this.showless(params.row.mockResponse) + " ...更多内容"
                     : params.row.mockResponse
                 )
@@ -228,28 +263,49 @@ export default {
                 },
                 "复制创建"
               )
-            ]);
+            ])
           }
         }
       ],
       data: []
-    };
+    }
   },
   methods: {
+
+    changeWorkMode:function(workMode){
+
+      if(workMode == 'UPSTREAM')
+      {
+        this.upstreamMode = true
+        this.responseBody = false
+        this.responseHeaders = false
+      }
+      else{
+        this.upstreamMode = false
+        this.addRule.upstreams = {protocol:'',address:'',uri:''}
+        this.responseBody = true
+        this.responseHeaders = true
+      }
+
+    },
+
     showless: function(mockResponse) {
-      return mockResponse.substring(0, 128);
+      return mockResponse.substring(0, 128)
     },
 
     changePageSize: async function(size) {
-      this.pageSize = size;
-      this.queryMockRules();
+      this.pageSize = size
+      this.queryMockRules(0)
     },
     changePageNumber: async function(number) {
-      this.pageNumber = number;
-      this.queryMockRules();
+      this.pageNumber = number
+      this.queryMockRules(0)
     },
-    queryMockRules: async function() {
+    queryMockRules: async function(page) {
       let uri = this.server + "/api/mock/2.0/queryRule" + "";
+
+    if(page == 1)
+      this.pageNumber = page
 
       let requestBody = {
         host: this.hostName,
@@ -377,7 +433,11 @@ p {
 .button {
   margin: 0px 5px;
 }
-
+/* 
+.nextedForm div{
+  margin-right:5px;
+  
+} */
 </style>
 
 <style>
