@@ -469,6 +469,10 @@ export default {
         this.addRule.workMode = 'UPSTREAM'
         this.showUpstreamMode = true
       }
+      else{
+        this.addRule.workMode = 'MOCK'
+        this.showUpstreamMode = false
+      }
 
     },
     copyMockRule: async function(params) {
@@ -489,7 +493,10 @@ export default {
         this.addRule.workMode = 'UPSTREAM'
         this.showUpstreamMode = true
       }
-
+      else{
+        this.addRule.workMode = 'MOCK'
+        this.showUpstreamMode = false
+      }
     },
     addOk: async function() {
       let uri
