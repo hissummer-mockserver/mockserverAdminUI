@@ -25,6 +25,21 @@
       @on-page-size-change="changePageSize($event)"
     />
 
+
+    <Modal v-model="testMockRule" width="360">
+        <p slot="header" style="color:#f60;text-align:center">
+
+        </p>
+        <div style="text-align:center">
+            <p>body</p>
+
+        </div>
+        <div slot="footer">
+            <Button type="info" size="large"  @click="cancel">Delete</Button>
+        </div>
+    </Modal>
+
+
     <!-- start of the add modal -->
     <Modal
       width="600px"
@@ -96,6 +111,10 @@
           placeholder="mock response body"
         />
       </div>
+
+    <Button class="info" type="primary" @click="testMockRule(addRule.mockResponse)">测试响应报文</Button>
+
+
     </Modal>
 
     <!-- end of the add modal -->
@@ -538,7 +557,25 @@ export default {
         )
       }
     },
-    cancel: async function() {}
+    cancel: async function() {},
+    testMockRule: async function(mockResponse)
+    {
+      let uri = this.server + "/api/mock/2.0/testRule" + ""
+      let postBody = lodash.cloneDeep(this.addRule)
+
+      postBody.responseHeaders = JSON.parse(postBody.responseHeaders) // 将字符串转换为json object
+
+      let postresult = await this.axios.post(uri, postBody)
+
+      if (postresult.data.success) {
+        this.$refs.noticeinformation.showalert("success", "测试结果详见弹窗")
+      } else {
+        this.$refs.noticeinformation.showalert(
+          "error",
+          "测试失败:" + postresult.data.message
+        )
+      }
+    }
   }
 }
 </script>
