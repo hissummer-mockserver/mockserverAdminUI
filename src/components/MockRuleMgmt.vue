@@ -26,16 +26,12 @@
     />
 
 
-    <Modal v-model="testMockRule" width="360">
-        <p slot="header" style="color:#f60;text-align:center">
+    <Modal v-model="testMockRuleModal" title="测试结果" width="360">
 
-        </p>
-        <div style="text-align:center">
-            <p>body</p>
-
+        <div style="text-align:left">
+            {{testMockRuleResponse}}
         </div>
         <div slot="footer">
-            <Button type="info" size="large"  @click="cancel">Delete</Button>
         </div>
     </Modal>
 
@@ -112,7 +108,7 @@
         />
       </div>
 
-    <Button class="info" type="primary" @click="testMockRule(addRule.mockResponse)">测试响应报文</Button>
+    <Button class="testMockRule" type="info" @click="testMockRule(addRule.mockResponse)">测试响应报文</Button>
 
 
     </Modal>
@@ -206,6 +202,8 @@ export default {
   },
   data() {
     return {
+      testMockRuleModal:false,
+      testMockRuleResponse:'',
       server: this.$store.getters.getServer,
       hostName: "",
       requestUri: null,
@@ -567,14 +565,9 @@ export default {
 
       let postresult = await this.axios.post(uri, postBody)
 
-      if (postresult.data.success) {
-        this.$refs.noticeinformation.showalert("success", "测试结果详见弹窗")
-      } else {
-        this.$refs.noticeinformation.showalert(
-          "error",
-          "测试失败:" + postresult.data.message
-        )
-      }
+        this.testMockRuleModal = true
+        this.testMockRuleResponse = postresult.data.message
+      
     }
   }
 }
@@ -600,6 +593,9 @@ p {
   margin-right:5px
   
 } */
+.testMockRule{
+  margin-top:10px;
+}
 </style>
 
 <style>
