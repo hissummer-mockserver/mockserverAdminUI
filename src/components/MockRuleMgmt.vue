@@ -26,9 +26,9 @@
     />
 
 
-    <Modal v-model="testMockRuleModal" title="测试结果" width="360">
+    <Modal width="400px" v-model="testMockRuleModal" title="测试结果" width="360">
 
-        <div style="text-align:left">
+        <div style="text-align:left;line-break:anywhere;">
             {{testMockRuleResponse}}
         </div>
         <div slot="footer">
