@@ -19,7 +19,7 @@
     </div>
     <Divider></Divider>
     <div style="text-align:center;margin:20px;font-size:1.5em;">
-      <a href="https://mockserver.hissummer.com" target="_blank">2019 Hissummer Mockserver</a> |
+      <a href="https://www.hissummer.com" target="_blank">Hissummer Mockserver</a> |
       <a href="https://mockserver.hissummer.com/" target="_blank">使用帮助</a>
     </div>
   </div>
@@ -48,7 +48,7 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     server: "http://localhost:8081",
-    standalone: false
+    standalone: false 
   },
   getters: {
     getServer(state) {
