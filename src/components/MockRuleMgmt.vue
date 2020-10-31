@@ -117,7 +117,8 @@ export default {
         mockResponse: null,
         workMode: "MOCK",
         update: false,
-        responseHeaders: null
+        responseHeaders: null,
+        category:null
       },
       update: null,
       addRuleModal: false,
@@ -129,6 +130,10 @@ export default {
           // render: (h, params) => {
           //   return h("div", params.row._id.$oid);
           // }
+        },
+                {
+          title: "category",
+          key: "category"
         },
         {
           title: "hostName",
@@ -277,6 +282,7 @@ export default {
       this.addRule.uri = null;
       this.addRule.mockResponse = null;
       this.addRule.responseHeaders = null;
+      this.addRule.category = null;
       this.modalTitle = "添加Mock规则";
       this.addRuleModal = true;
     },
@@ -286,6 +292,7 @@ export default {
       this.addRule.mockResponse = params.row.mockResponse;
       //console.log(params.row._id);
       this.addRule.id = params.row.id;
+      this.addRule.category = params.row.category;
       this.addRule.update = true;
       this.deleteRuleModal = true;
 
@@ -300,6 +307,7 @@ export default {
         params.row.responseHeaders == null
           ? null
           : JSON.stringify(params.row.responseHeaders);
+      this.addRule.category = params.row.category;
       this.addRule.update = true;
       this.modalTitle = "修改Mock规则";
       this.addRuleModal = true;
@@ -313,6 +321,7 @@ export default {
         params.row.responseHeaders == null
           ? null
           : JSON.stringify(params.row.responseHeaders);
+      this.addRule.id = params.row.id;
       this.addRule.update = false;
       this.modalTitle = "根据已有规则创建Mock规则";
       this.addRuleModal = true;
