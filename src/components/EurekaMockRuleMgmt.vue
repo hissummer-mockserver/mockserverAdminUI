@@ -227,7 +227,10 @@ export default {
           }
         }
       ],
-      data: []
+      data: [],
+            newaxios:this.axios.create({
+        withCredentials: true
+      })
     };
   },
   methods: {
@@ -275,7 +278,7 @@ export default {
         pageSize: this.pageSize
       };
 
-      let postresult = await this.axios.post(uri, requestBody);
+      let postresult = await this.newaxios.post(uri, requestBody);
 
       console.log(postresult.data.data);
       if (postresult.data.data != null) {
@@ -328,7 +331,7 @@ export default {
 
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
       try{
-      let postresult = await this.axios.post(uri, this.addRule);
+      let postresult = await this.newaxios.post(uri, this.addRule);
 
       console.log(postresult);
 
@@ -352,7 +355,7 @@ export default {
     },
     deleteOk: async function() {
       let uri = this.server + "/api/mock/2.0/deleteEurekaRule" + '';
-      let postresult = await this.axios.post(uri, { id: this.addRule.id });
+      let postresult = await this.newaxios.post(uri, { id: this.addRule.id });
       if (postresult.data.success) {
         await this.queryMockRules();
         this.$refs.noticeinformation.showalert("success", "删除成功");

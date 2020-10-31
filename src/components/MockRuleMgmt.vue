@@ -3,11 +3,17 @@
     <Divider>Http Mock Rule 管理</Divider>
     <Input
       class="input"
+      v-model="category"
+      placeholder="分组"
+      style="width: 300px"
+    />
+    <Input
+      class="input"
       v-model="hostName"
       placeholder="hostName: 例如*"
       style="width: 300px"
     />
-    <Input class="input" v-model="requestUri" placeholder="uri: uri 以/为开头" style="width: 300px" />
+    <Input class="input" v-model="requestUri" placeholder="uri: 支持模糊匹配" style="width: 300px" />
     <Button class="button" type="primary" @click="changePageNumber(1)">查询</Button>
     <Button class="button" type="primary" @click="addMockRule()">添加</Button>
     <noticeinformation ref="noticeinformation"></noticeinformation>
@@ -26,7 +32,7 @@
     />
 
 
-    <Modal width="400px" v-model="testMockRuleModal" title="测试结果" width="360">
+    <Modal width="400px" v-model="testMockRuleModal" title="测试结果" >
 
         <div style="text-align:left;line-break:anywhere;">
             {{testMockRuleResponse}}
@@ -44,6 +50,16 @@
       @on-ok="addOk"
       @on-cancel="cancel"
     >
+
+      <div>
+        <span class="modalInputLabel">分组:</span>
+        <Input
+          v-model="addRule.category"
+          placeholder="mock规则的分组"
+          style="width: 400px"
+        />
+      </div>
+
       <div>
         <span class="modalInputLabel">请求Host:</span>
         <Input
@@ -108,7 +124,7 @@
         />
       </div>
 
-    <Button class="testMockRule" type="info" @click="testMockRule(addRule.mockResponse)">测试响应报文</Button>
+    <Button class="testMockRule" type="info" @click="testMockRule()">测试响应报文</Button>
 
 
     </Modal>
@@ -205,7 +221,8 @@ export default {
       testMockRuleModal:false,
       testMockRuleResponse:'',
       server: this.$store.getters.getServer,
-      hostName: "",
+      hostName: '',
+      category:'',
       requestUri: null,
       mockRulesTotalSize: 0,
       pageSize: 10,
@@ -225,12 +242,14 @@ export default {
         workMode: "MOCK",
         upstreams:{nodes:[{protocol:'',address:'',uri:''}]},
         update: false,
-        responseHeaders: null
+        responseHeaders: null,
+        category:null
       },
       update: null,
       addRuleModal: false,
       deleteRuleModal: false,
       columns: [
+        /*
         {
           title: "id",
           key: "id",
@@ -239,6 +258,11 @@ export default {
           //   return h("div", params.row._id.$oid)
           // }
         },
+        */
+        {
+          title: "分组",
+          key: "category",
+        },       
         {
           title: "hostName",
           key: "host",
@@ -276,7 +300,10 @@ export default {
           render: this.renderActionColumn
         }
       ],
-      data: []
+      data: [],
+      newaxios:this.axios.create({
+        withCredentials: true
+      })
     }
   },
   methods: {
@@ -426,13 +453,14 @@ export default {
       let uri = this.server + "/api/mock/2.0/queryRule" + ""
 
         let requestBody = {
+          category:this.category,
           host: this.hostName,
           uri: this.requestUri,
           pageNumber: this.pageNumber - 1,
           pageSize: this.pageSize
         }
 
-        let postresult = await this.axios.post(uri, requestBody)
+        let postresult = await this.newaxios.post(uri, requestBody)
 
         console.log(postresult.data.data)
         if (postresult.data.data != null) {
@@ -444,76 +472,83 @@ export default {
 
         this.$refs.noticeinformation.clear()
     },
-
-    addMockRule: async function() {
+    emptyMockRuleData: function(){
       this.addRule.id = null
       this.addRule.update = false
       this.addRule.uri = null
       this.addRule.mockResponse = null
       this.addRule.responseHeaders = null
-      this.modalTitle = "添加Mock规则"
-      this.addRuleModal = true
+      this.addRule.category = null
     },
-    deleteMockRule: async function(params) {
+    assignMockRuleData:function(params){
       this.addRule.host = params.row.host
       this.addRule.uri = params.row.uri
       this.addRule.mockResponse = params.row.mockResponse
       this.addRule.id = params.row.id
       this.addRule.update = true
-      this.deleteRuleModal = true
+      this.addRule.category = params.row.category
       if(params.row.workMode == 'UPSTREAM'){
         this.addRule.upstreams = params.row.upstreams
         this.addRule.workMode = 'UPSTREAM'
-        this.showUpstreamMode = true
       }
-
-    },
-    updateMockRule: async function(params) {
-      this.addRule.host = params.row.host
-      this.addRule.uri = params.row.uri
-      this.addRule.mockResponse = params.row.mockResponse
-      this.addRule.id = params.row.id
+      else{
+                this.addRule.workMode = 'MOCK'
+      }
       this.addRule.responseHeaders =
         params.row.responseHeaders == null
           ? null
           : JSON.stringify(params.row.responseHeaders)
-      this.addRule.update = true
+    },
+    addMockRule: async function() {
+      this.emptyMockRuleData()
+      this.modalTitle = "添加Mock规则"
+      this.addRuleModal = true
+    },
+    deleteMockRule: async function(params) {
+      this.assignMockRuleData(params)
+
+      if(params.row.workMode == 'UPSTREAM'){
+
+        this.showUpstreamMode = true
+      }
+
+       this.deleteRuleModal = true
+
+    },
+    updateMockRule: async function(params) {
+
+            this.assignMockRuleData(params)
+
+
       this.modalTitle = "修改Mock规则"
       this.addRuleModal = true
 
       if(params.row.workMode == 'UPSTREAM'){
-        this.addRule.upstreams = params.row.upstreams
-        this.addRule.workMode = 'UPSTREAM'
         this.showUpstreamMode = true
       }
       else{
-        this.addRule.workMode = 'MOCK'
         this.showUpstreamMode = false
       }
 
     },
     copyMockRule: async function(params) {
-      this.addRule.host = params.row.host
+      
+      this.assignMockRuleData(params)
       this.addRule.id = null
-      this.addRule.uri = params.row.uri
-      this.addRule.mockResponse = params.row.mockResponse
-      this.addRule.responseHeaders =
-        params.row.responseHeaders == null
-          ? null
-          : JSON.stringify(params.row.responseHeaders)
-      this.addRule.update = false
+
       this.modalTitle = "根据已有规则创建Mock规则"
-      this.addRuleModal = true
 
       if(params.row.workMode == 'UPSTREAM'){
-        this.addRule.upstreams = params.row.upstreams
-        this.addRule.workMode = 'UPSTREAM'
+
         this.showUpstreamMode = true
       }
       else{
-        this.addRule.workMode = 'MOCK'
         this.showUpstreamMode = false
       }
+     this.addRule.update = false
+     this.modalTitle = "复制Mock规则"
+    this.addRuleModal = true
+
     },
     addOk: async function() {
       let uri
@@ -528,7 +563,7 @@ export default {
 
       postBody.responseHeaders = JSON.parse(postBody.responseHeaders)
 
-      let postresult = await this.axios.post(uri, postBody)
+      let postresult = await this.newaxios.post(uri, postBody)
 
       console.log(postresult.data.data)
 
@@ -544,7 +579,7 @@ export default {
     },
     deleteOk: async function() {
       let uri = this.server + "/api/mock/2.0/deleteRule" + ""
-      let postresult = await this.axios.post(uri, { id: this.addRule.id })
+      let postresult = await this.newaxios.post(uri, { id: this.addRule.id })
       if (postresult.data.success) {
         await this.queryMockRules()
         this.$refs.noticeinformation.showalert("success", "删除成功")
@@ -556,14 +591,14 @@ export default {
       }
     },
     cancel: async function() {},
-    testMockRule: async function(mockResponse)
+    testMockRule: async function()
     {
       let uri = this.server + "/api/mock/2.0/testRule" + ""
       let postBody = lodash.cloneDeep(this.addRule)
 
       postBody.responseHeaders = JSON.parse(postBody.responseHeaders) // 将字符串转换为json object
 
-      let postresult = await this.axios.post(uri, postBody)
+      let postresult = await this.newaxios.post(uri, postBody)
 
         this.testMockRuleModal = true
         this.testMockRuleResponse = postresult.data.message

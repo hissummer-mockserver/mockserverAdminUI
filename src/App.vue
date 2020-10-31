@@ -1,7 +1,14 @@
 <template>
   <div id="app">
-    <div class="header">MockServer Management</div>
+    <div class="header">MockServer Management
+
+      <div class="rightMenu"> {{loginName}}</div>
+    </div>
+
+    
     <div id="body">
+
+      <div>
       <Tabs type="card">
         <TabPane key="mockRule" name="mockRule" label="Http Mock Rule" class="show_align">
           <MockRuleMgmt />
@@ -16,12 +23,24 @@
           <EurekaMockRuleMgmt />
         </TabPane>
       </Tabs>
+      </div>
+
+      <div>
+        <usermgmt></usermgmt>
+      </div>
+
+
     </div>
+
+
+
     <Divider></Divider>
     <div style="text-align:center;margin:20px;font-size:1.5em;">
       <a href="https://www.hissummer.com" target="_blank">Hissummer Mockserver</a> |
       <a href="https://mockserver.hissummer.com/" target="_blank">使用帮助</a>
     </div>
+
+
   </div>
 </template>
 
@@ -45,10 +64,15 @@ Vue.use(iview);
 Vue.component("noticeinformation", noticeinformation);
 Vue.use(Vuex);
 
+import usermgmt from "./components/user.vue";
+Vue.component("usermgmt", usermgmt);
+
+
+
 const store = new Vuex.Store({
   state: {
     server: "http://localhost:8081",
-    standalone: false 
+    standalone: true 
   },
   getters: {
     getServer(state) {
@@ -67,7 +91,17 @@ export default {
   components: {
     MockRuleMgmt,
     EurekaMockRuleMgmt
+  },
+  data(){ 
+    
+    return {
+
+        loginName:'noLogin'
   }
+
+  }
+
+
 };
 </script>
 
@@ -95,6 +129,12 @@ export default {
   font-size: 1.5em;
   margin-bottom: 10px;
 }
+
+.rightMenu{
+  float:right;
+  font-size:0.7em;
+}
+
 </style>
 
 <style >
