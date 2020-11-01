@@ -2,13 +2,13 @@
   <div id="app">
     <div class="header">MockServer Management
 
-      <div class="rightMenu"> {{loginName}}</div>
+      <div class="rightMenu" @click="logout"> {{loginName}}</div>
     </div>
 
     
     <div id="body">
 
-      <div>
+      <div v-if="showTabs">
       <Tabs type="card">
         <TabPane key="mockRule" name="mockRule" label="Http Mock Rule" class="show_align">
           <MockRuleMgmt />
@@ -25,10 +25,9 @@
       </Tabs>
       </div>
 
-      <div>
-        <usermgmt></usermgmt>
+      <div v-if="showUsermgmt">
+        <usermgmt v-on:logon="logon($event)"></usermgmt>
       </div>
-
 
     </div>
 
@@ -96,11 +95,92 @@ export default {
     
     return {
 
-        loginName:'noLogin'
-  }
+        loginName:'noLogin',
+        showTabs:false,
+        showUsermgmt:false,
+        newaxios:this.axios.create({
+        withCredentials: true
+      }),
+      server: this.$store.getters.getServer,
 
-  }
+    }
 
+  },
+
+  created:function(){
+      this.checkLogin()
+  },
+methods:{
+
+    checkLogin:async function(){
+        
+        try {
+      let uri
+
+      uri = this.server + "/api/mock/2.0/isLogin"
+
+      //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
+
+      let postresult = await this.newaxios.post(uri, {})
+
+      console.log('------------------')
+      console.log(postresult)
+
+      if (postresult.status = 200 && postresult.data.success) {
+
+        this.showTabs = true
+        this.showUsermgmt = false
+        this.loginName = 'welcome '+localStorage.username+' , logout.'
+
+      } else {
+        this.showTabs = false
+        this.showUsermgmt = true
+
+      }
+      }
+      catch(e)
+      {
+        console.log(e)
+        console.log(e.response)
+        this.showTabs = false
+        this.showUsermgmt = true
+      }
+
+    },
+
+    logout:async function(){
+
+      let uri
+
+      uri = this.server + "/api/mock/2.0/logout"
+
+      //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
+
+      let postresult = await this.newaxios.post(uri, {username:localStorage.username})
+
+      console.log(postresult)
+
+      if (postresult.status = 200 && postresult.data.success) {
+
+        this.showTabs = false
+        this.showUsermgmt = true
+        this.loginName = 'noLogin'
+
+      } else {
+
+        this.checkLogin()
+      }
+
+
+    },
+    logon:function(username){
+
+        this.showTabs = true
+        this.showUsermgmt = false
+        this.loginName = 'welcome '+username+' , logout.'
+
+    }
+}
 
 };
 </script>
@@ -133,6 +213,12 @@ export default {
 .rightMenu{
   float:right;
   font-size:0.7em;
+  cursor:pointer;
+}
+
+.loading{
+  font-size:2em;
+  font-weight:bold;
 }
 
 </style>

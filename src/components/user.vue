@@ -1,7 +1,10 @@
 <template>
   <div>
-<div class="loginform">
-      <div>
+
+        <noticeinformation ref="noticeinformation"></noticeinformation>
+
+<div v-if="showloginform" class="loginform">
+      <div class="modalInputLabel">
         <span class="modalInputLabel">username:</span>
         <Input
           v-model="username"
@@ -10,7 +13,7 @@
         />
       </div>
 
-<div>
+      <div class="modalInputLabel">
         <span class="modalInputLabel">password:</span>
         <Input
           type = "password"
@@ -20,13 +23,13 @@
         />
       </div>
 
-    <Button class="button" type="primary" @click="login">查询</Button>
+    <Button class="button" type="primary" @click="login">Login</Button>
 
 
 </div>
 
 <!-- class="usermgmt" start  -->
-<div class="usermgmt">
+<div v-if="showusermgmt" class="usermgmt">
 
 
 </div>
@@ -41,18 +44,26 @@
 export default {
   created: function() {
 
+
+
   },
   data() {
     return {
       username:'',
       password:'',
       server: this.$store.getters.getServer,
+      showloginform:true,
+      showusermgmt:false,
+      newaxios:this.axios.create({
+        withCredentials: true
+      })
     }
   },
   methods: {
-    login:async function(){
 
-      console.log(document.domain)
+
+
+    login:async function(){
 
       let uri
 
@@ -60,14 +71,24 @@ export default {
 
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
 
-      let postresult = await this.axios.post(uri, {username:this.username, password:this.password}, {withCredentials: true})
+      let postresult = await this.newaxios.post(uri, {username:this.username, password:this.password})
 
-      console.log(postresult.data.data)
+      console.log(postresult)
 
-      if (postresult.data.success) {
-        //
+      if (postresult.status = 200 && postresult.data.success) {
+        
+        //login success
+        this.$refs.noticeinformation.clear()
+
+        this.showloginform = false
+
+        this.$emit('logon',this.username)
+        localStorage.username = this.username
+
       } else {
           //
+          this.$refs.noticeinformation.showalert("warning", "login failed!")
+
       }
 
     }
@@ -75,6 +96,16 @@ export default {
 }
 </script>
 <style scoped>
+.button{
+  margin:10px 0px;
+}
+div.modalInputLabel{
+  margin:15px 5px;
+}
+
+span.modalInputLabel{
+  margin-right:15px;
+}
 </style>
 
 <style>

@@ -33,7 +33,7 @@ export default {
       this.alert.success.display = false;
       this.alert.warning.display = false;
       this.alert.error.display = false;
-      this.alert[alert].message = '时间:'+new Date().toLocaleDateString()+ ' '+message;
+      this.alert[alert].message = '时间:'+new Date().toLocaleString()+ ' '+message;
       this.alert[alert].display = true;
     }
     ,
