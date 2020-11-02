@@ -2,7 +2,23 @@
   <div id="app">
     <div class="header">MockServer Management
 
-      <div class="rightMenu" @click="logout"> {{loginName}}</div>
+      <div v-if="!showUserlogin " class="rightMenu" > 
+<Dropdown>
+
+            <a style="color:white;">{{loginName}}</a>
+
+        <DropdownMenu slot="list">
+            <DropdownItem v-if="!showTabs"><span @click="showtabs">rule Management</span></DropdownItem>
+            <DropdownItem ><span @click="showchangePasswordForm">change Password</span></DropdownItem>
+            <DropdownItem ><span @click="logout">logout</span></DropdownItem>
+
+
+        </DropdownMenu>
+    </Dropdown>
+
+      </div>
+
+      
     </div>
 
     
@@ -25,8 +41,12 @@
       </Tabs>
       </div>
 
-      <div v-if="showUsermgmt">
-        <usermgmt v-on:logon="logon($event)"></usermgmt>
+      <div v-if="showUserlogin">
+        <userlogin v-on:logon="logon($event)"></userlogin>
+      </div>
+
+      <div v-if="showrepassword">
+        <reuserpassword ></reuserpassword>
       </div>
 
     </div>
@@ -63,10 +83,10 @@ Vue.use(iview);
 Vue.component("noticeinformation", noticeinformation);
 Vue.use(Vuex);
 
-import usermgmt from "./components/user.vue";
-Vue.component("usermgmt", usermgmt);
-
-
+import userlogin from "./components/userlogin.vue";
+Vue.component("userlogin", userlogin);
+import reuserpassword from "./components/reuserpassword.vue";
+Vue.component("reuserpassword", reuserpassword);
 
 const store = new Vuex.Store({
   state: {
@@ -97,7 +117,8 @@ export default {
 
         loginName:'noLogin',
         showTabs:false,
-        showUsermgmt:false,
+        showUserlogin:false,
+        showrepassword:false,
         newaxios:this.axios.create({
         withCredentials: true
       }),
@@ -126,15 +147,15 @@ methods:{
       console.log('------------------')
       console.log(postresult)
 
-      if (postresult.status = 200 && postresult.data.success) {
+      if (postresult.status == 200 && postresult.data.success) {
 
         this.showTabs = true
-        this.showUsermgmt = false
-        this.loginName = 'welcome '+localStorage.username+' , logout.'
+        this.showUserlogin = false
+        this.loginName = 'welcome '+localStorage.username+''
 
       } else {
         this.showTabs = false
-        this.showUsermgmt = true
+        this.showUserlogin = true
 
       }
       }
@@ -143,7 +164,7 @@ methods:{
         console.log(e)
         console.log(e.response)
         this.showTabs = false
-        this.showUsermgmt = true
+        this.showUserlogin = true
       }
 
     },
@@ -160,10 +181,10 @@ methods:{
 
       console.log(postresult)
 
-      if (postresult.status = 200 && postresult.data.success) {
+      if (postresult.status == 200 && postresult.data.success) {
 
         this.showTabs = false
-        this.showUsermgmt = true
+        this.showUserlogin = true
         this.loginName = 'noLogin'
 
       } else {
@@ -176,8 +197,21 @@ methods:{
     logon:function(username){
 
         this.showTabs = true
-        this.showUsermgmt = false
-        this.loginName = 'welcome '+username+' , logout.'
+        this.showUserlogin = false
+        this.loginName = 'welcome '+username+''
+
+    },
+    showchangePasswordForm:function()
+    {
+
+        this.showTabs = false
+        this.showrepassword = true
+
+    },
+    showtabs:function(){
+        this.showTabs = true
+        this.showrepassword = false
+
 
     }
 }
@@ -214,8 +248,15 @@ methods:{
   float:right;
   font-size:0.7em;
   cursor:pointer;
+  margin:10px 0px 5px;
 }
+.rightMenu span{
 
+  width:auto;
+  padding:3px 10px;
+  display: block !important;
+
+}
 .loading{
   font-size:2em;
   font-weight:bold;

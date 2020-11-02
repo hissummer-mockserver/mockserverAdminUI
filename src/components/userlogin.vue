@@ -28,13 +28,6 @@
 
 </div>
 
-<!-- class="usermgmt" start  -->
-<div v-if="showusermgmt" class="usermgmt">
-
-
-</div>
-
-
 
 </div>
 </template>
@@ -53,7 +46,6 @@ export default {
       password:'',
       server: this.$store.getters.getServer,
       showloginform:true,
-      showusermgmt:false,
       newaxios:this.axios.create({
         withCredentials: true
       })
@@ -75,7 +67,7 @@ export default {
 
       console.log(postresult)
 
-      if (postresult.status = 200 && postresult.data.success) {
+      if (postresult.status == 200 && postresult.data.success) {
         
         //login success
         this.$refs.noticeinformation.clear()
