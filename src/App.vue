@@ -55,7 +55,7 @@
 
     <Divider></Divider>
     <div style="text-align:center;margin:20px;font-size:1.5em;">
-      <a href="https://www.hissummer.com" target="_blank">Hissummer Mockserver</a> |
+      <a href="https://qa.heika.com" target="_blank">Mockserver</a> |
       <a href="https://mockserver.hissummer.com/" target="_blank">使用帮助</a>
     </div>
 
@@ -184,6 +184,7 @@ methods:{
       if (postresult.status == 200 && postresult.data.success) {
 
         this.showTabs = false
+        this.showrepassword = false
         this.showUserlogin = true
         this.loginName = 'noLogin'
 
