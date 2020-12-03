@@ -1,23 +1,24 @@
 <template>
-  <div>
-  </div>
+<div>
+</div>
 </template>
+
 <script>
-
 export default {
-  created: function() {
+    created: function () {
 
-  },
-  data() {
-    return {
+    },
+    data() {
+        return {
+
+        }
+    },
+    methods: {
 
     }
-  },
-  methods: {
-
-  }
 }
 </script>
+
 <style scoped>
 </style>
 
