@@ -10,7 +10,7 @@
     <Table border :columns="columns" :data="data"></Table>
     <Page class="page" :total="mockRulesTotalSize" show-total show-sizer :page-size-opts="[10,20,30]" :page-size="10" @on-change="changePageNumber($event)" @on-page-size-change="changePageSize($event)" />
 
-    <Modal width="600px" v-model="addRuleModal" :title="modalTitle" @on-ok="addOk" @on-cancel="cancel">
+    <Modal width="600px" :mask-closable="false" v-model="addRuleModal" :title="modalTitle" @on-ok="addOk" @on-cancel="cancel">
         <!-- <div>
         <span class="modalInputLabel">Eureka版本:</span>
         <Select v-model="addRule.version" style="width:200px">
@@ -44,7 +44,7 @@
         </div>
     </Modal>
 
-    <Modal width="600px" v-model="deleteRuleModal" title="删除Mock规则" @on-ok="deleteOk" @on-cancel="cancel">
+    <Modal width="600px" :mask-closable="false" v-model="deleteRuleModal" title="删除Mock规则" @on-ok="deleteOk" @on-cancel="cancel">
         <div>
             将删除规则?
         </div>

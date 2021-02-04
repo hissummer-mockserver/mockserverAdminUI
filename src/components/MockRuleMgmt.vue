@@ -11,7 +11,7 @@
     <Table border :columns="columns" :data="data"></Table>
     <Page class="page" :total="mockRulesTotalSize" :current="pageNumber" show-total show-sizer :page-size-opts="[10,20,30]" :page-size="10" @on-change="changePageNumber($event)" @on-page-size-change="changePageSize($event)" />
 
-    <Modal width="400px" v-model="testMockRuleModal" title="测试结果">
+    <Modal width="400px" :mask-closable="false" v-model="testMockRuleModal" title="测试结果">
 
         <div style="text-align:left;line-break:anywhere;">
             {{testMockRuleResponse}}
@@ -21,7 +21,7 @@
     </Modal>
 
     <!-- start of the add modal -->
-    <Modal width="600px" v-model="addRuleModal" :title="modalTitle" @on-ok="addOk" @on-cancel="cancel">
+    <Modal width="600px" :mask-closable="false" v-model="addRuleModal" :title="modalTitle" @on-ok="addOk" @on-cancel="cancel">
 
         <div>
             <span class="modalInputLabel">分组:</span>
@@ -71,7 +71,7 @@
     <!-- end of the add modal -->
 
     <!-- start of the delete modal -->
-    <Modal width="600px" v-model="deleteRuleModal" title="删除Mock规则" @on-ok="deleteOk" @on-cancel="cancel">
+    <Modal width="600px" :mask-closable="false" v-model="deleteRuleModal" title="删除Mock规则" @on-ok="deleteOk" @on-cancel="cancel">
         <div>
             <span class="modalInputLabel">请求Host:</span>
             <Input disabled v-model="addRule.host" placeholder="要添加的HostName,为空或者* 则表示会匹配所有HostName" style="width: 400px" />
