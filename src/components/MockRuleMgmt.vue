@@ -37,6 +37,12 @@
             <Select v-model="addRule.workMode" style="width:200px" @on-change="changeWorkMode($event)">
                 <Option v-for="item in workModeOption" :value="item.value" :key="item.value">{{ item.label }}</Option>
             </Select>
+        </div>
+
+        <div>
+            <span class="modalInputLabel">请求Uri:</span>
+            <Input v-model="addRule.uri" placeholder="要匹配的Uri路径,不含协议地址和端口号,以/开头" style="width: 400px" />
+        </div>
             <div v-if="showUpstreamMode">
                 <div class="nextedForm">
                     <span class="modalInputLabel">上游服务: </span>
@@ -48,14 +54,6 @@
                 </div>
 
             </div>
-
-        </div>
-
-        <div>
-            <span class="modalInputLabel">请求Uri:</span>
-            <Input v-model="addRule.uri" placeholder="要匹配的Uri路径,不含协议地址和端口号,以/开头" style="width: 400px" />
-        </div>
-
         <div v-if="!showUpstreamMode">
             <span class="modalInputLabel">响应Headers:</span>
             <Input v-model="addRule.responseHeaders" type="textarea" :rows="5" placeholder="{'header1':'value1'}" />
