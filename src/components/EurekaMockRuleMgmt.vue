@@ -209,7 +209,7 @@ export default {
         },
 
         changeEnable: async function (status, params) {
-            console.log(status)
+            this.Vue.$log(status)
             this.addRule = params.row
             this.addRule.update = true
             if (params.row.enable) {
@@ -245,14 +245,13 @@ export default {
 
             let postresult = await this.newaxios.post(uri, requestBody);
 
-            console.log(postresult.data.data);
+            this.Vue.$log(postresult.data.data);
             if (postresult.data.data != null) {
                 this.mockRulesTotalSize = postresult.data.data.totalElements;
                 this.data = postresult.data.data.content;
             } else {
                 this.data = [];
             }
-
             this.$refs.noticeinformation.clear();
         },
 
@@ -268,7 +267,7 @@ export default {
         },
         deleteMockRule: async function (params) {
             this.addRule = params.row;
-            //console.log(params.row._id);
+            //Vue.$log(params.row._id);
             this.addRule.update = true;
             this.deleteRuleModal = true;
             //not supported
@@ -282,7 +281,7 @@ export default {
         copyMockRule: async function (params) {
             this.addRule = params.row;
             this.addRule.id = null
-            //console.log(params.row._id);
+            //Vue.$log(params.row._id);
             this.addRule.update = false;
             this.modalTitle = "根据已有规则创建Mock规则";
             this.addRuleModal = true;
@@ -298,7 +297,7 @@ export default {
             try {
                 let postresult = await this.newaxios.post(uri, this.addRule);
 
-                console.log(postresult);
+                this.Vue.$log(postresult);
 
                 if (postresult.data.success) {
                     await this.queryMockRules();
