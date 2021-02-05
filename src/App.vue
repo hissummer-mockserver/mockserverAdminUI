@@ -32,7 +32,9 @@
                 </TabPane>
             </Tabs>
         </div>
-
+        <div v-if="!showUserlogin && !showTabs">
+            <div>Loading...</div>
+        </div>
         <div v-if="showUserlogin">
             <userlogin v-on:logon="logon($event)"></userlogin>
         </div>
@@ -80,7 +82,7 @@ Vue.component("reuserpassword", reuserpassword);
 const store = new Vuex.Store({
     state: {
         server: "http://localhost:8081",
-        standalone: true 
+        standalone: false 
     },
     getters: {
         getServer(state) {
@@ -132,7 +134,8 @@ export default {
                 //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
 
                 let postresult = await this.newaxios.post(uri, {})
-
+                console.log(this)
+                console.log(this.Vue)
                 console.log('------------------')
                 console.log(postresult)
 
