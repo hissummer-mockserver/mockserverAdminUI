@@ -20,6 +20,18 @@
         </div>
     </Modal>
 
+    <Modal width="1024px" :mask-closable="false" v-model="querylogModal" title="测试结果">
+
+        <div style="text-align:left;line-break:anywhere;">
+
+                <Table border :columns="requestlogcolumns" :data="requestlogdata"></Table>
+                <Page class="page" :total="mockRulesTotalSize" :current="pageNumber" show-total show-sizer :page-size-opts="[10,20,30]" :page-size="10" @on-change="" @on-page-size-change="" />
+
+        </div>
+        <div slot="footer">
+        </div>
+    </Modal>
+
     <!-- start of the add modal -->
     <Modal width="600px" :mask-closable="false" v-model="addRuleModal" :title="modalTitle" @on-ok="addOk" @on-cancel="cancel">
 
@@ -128,6 +140,7 @@ export default {
     data() {
         return {
             testMockRuleModal: false,
+            querylogModal:false,
             testMockRuleResponse: '',
             server: this.$store.getters.getServer,
             hostName: '',
@@ -136,6 +149,8 @@ export default {
             mockRulesTotalSize: 0,
             pageSize: 10,
             pageNumber: 1,
+            requestlogPageSize:20,
+            requestlogPageNumber:1,
             modalTitle: "",
             workModeOption: [{
                     value: "MOCK",
@@ -168,6 +183,39 @@ export default {
             update: null,
             addRuleModal: false,
             deleteRuleModal: false,
+            requestlogdata:[],
+            requestlogcolumns:[
+
+                 {
+                    title: "请求时间",
+                    key: "createTime",
+                },
+                {
+                    title: "是否为mock",
+                    key: "mock",
+                },               
+                {
+                    title: "实际请求uri",
+                    key: "requestUri",
+                },              
+                {
+                    title: "请求头",
+                    key: "requestHeaders",
+                },    
+                {
+                    title: "请求报文",
+                    key: "requestBody",
+                },   
+                {
+                    title: "响应头",
+                    key: "responseHeaders",
+                },                       
+                {
+                    title: "响应报文",
+                    key: "responseBody",
+                    render:this.renderRequestLogBody
+                },                    
+            ],
             columns: [
                 /*
                 {
@@ -264,7 +312,28 @@ export default {
             }
 
         },
+        renderRequestLogBody: function (h, params) {
 
+                return h(
+                    "Tooltip", {
+                        props: {
+                            transfer: true,
+                            theme: 'light',
+                            placement: "left-start",
+                            'max-width': '500',
+                            content: params.row.responseBody
+                        }
+                    },
+                    [
+                        h(
+                            "div",
+                            this.showless(params.row.responseBody)
+                        )
+                    ]
+                )
+
+
+        },
         renderMockResponseHeaders: function (h, params) {
             let mockResponseHeaders = 'N/A'
             if (params.row.workMode == 'MOCK') {
@@ -326,6 +395,22 @@ export default {
                         }
                     },
                     "复制创建"
+                ),                h(
+                    "Button", {
+                        props: {
+                            type: "primary",
+                            size: "small"
+                        },
+                        style: {
+                            marginRight: "5px"
+                        },
+                        on: {
+                            click: () => {
+                                this.queryRequestlogs(params.row.uri)
+                            }
+                        }
+                    },
+                    "请求记录"
                 )
             ])
         },
@@ -390,6 +475,25 @@ export default {
             }
 
             this.$refs.noticeinformation.clear()
+        },
+        queryRequestlogs: async function(mockRuleRri){
+
+            this.querylogModal = true
+
+            let uri = this.server + "/api/mock/2.0/queryRequestLog" + ""
+
+            let requestBody = {
+                uri: mockRuleRri,
+                pageNumber: this.requestlogPageNumber - 1,
+                pageSize: this.requestlogPageSize
+            }
+
+            let postresult = await this.newaxios.post(uri, requestBody)
+
+            console.log(postresult);
+            if(postresult.data.data != null && postresult.data.data != undefined)
+                this.requestlogdata = postresult.data.data.content;
+
         },
         emptyMockRuleData: function () {
             this.addRule.id = null
