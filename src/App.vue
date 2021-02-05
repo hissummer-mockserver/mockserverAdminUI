@@ -45,7 +45,7 @@
 
     <Divider></Divider>
     <div style="text-align:center;margin:20px;font-size:1.5em;">
-        <a href="https://qa.heika.com" target="_blank">Mockserver</a> |
+        <a href="http://qa.heika.com" target="_blank">Mockserver v0.0.5</a> |
         <a href="https://mockserver.hissummer.com/" target="_blank">使用帮助</a>
     </div>
 
@@ -80,7 +80,7 @@ Vue.component("reuserpassword", reuserpassword);
 const store = new Vuex.Store({
     state: {
         server: "http://localhost:8081",
-        standalone: true
+        standalone: true 
     },
     getters: {
         getServer(state) {
