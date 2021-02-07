@@ -621,9 +621,16 @@ export default {
     },
     changeRequestLogPageNumber: async function (number) {
       console.log("------- " + number);
-      this.requestlogpageNumber = number;
+      this.requestlogPageNumber = number;
       this.queryRequestlogs(this.querylogByUri, this.querylogByHostName);
     },
+        queryRequestLogfirstPage:async function(mockRuleUri, mockRuleHostName){
+	this.requestlogdata = [];
+       this.requestlogPageNumber = 1;
+       this.requestlogPageSize = 7;
+       this.queryRequestlogs(mockRuleUri, querylogByHostName);
+    },
+
     changePageSize: async function (size) {
       this.pageSize = size;
       this.queryMockRules();
@@ -666,7 +673,7 @@ export default {
       let requestBody = {
         uri: mockRuleRri,
         hostname: mockRuleHostName,
-        pageNumber: this.requestlogpageNumber - 1,
+        pageNumber: this.requestlogPageNumber - 1,
         pageSize: this.requestlogPageSize,
       };
 
@@ -676,7 +683,8 @@ export default {
       if (postresult.data.data != null && postresult.data.data != undefined) {
         this.requestlogTotalSize = postresult.data.data.totalElements;
         this.requestlogdata = postresult.data.data.content;
-      } else this.requestlogdata = [];
+      } else 
+      { this.requestlogdata = []; this.requestlogTotalSize = 0; }
     },
     emptyMockRuleData: function () {
       this.addRule.id = null;
