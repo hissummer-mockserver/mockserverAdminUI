@@ -557,7 +557,7 @@ export default {
             },
             on: {
               click: () => {
-                this.queryRequestlogs(params.row.uri, params.row.host);
+                this.queryRequestLogfirstPage(params.row.uri, params.row.host);
               },
             },
           },
