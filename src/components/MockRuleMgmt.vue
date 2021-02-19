@@ -626,6 +626,7 @@ export default {
     },
         queryRequestLogfirstPage:async function(mockRuleUri, mockRuleHostName){
 	this.requestlogdata = [];
+  this.requestlogTotalSize = 0;
        this.requestlogPageNumber = 1;
        this.requestlogPageSize = 7;
        this.queryRequestlogs(mockRuleUri, mockRuleHostName);
