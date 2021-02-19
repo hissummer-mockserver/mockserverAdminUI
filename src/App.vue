@@ -81,7 +81,7 @@ Vue.component("reuserpassword", reuserpassword);
 
 const store = new Vuex.Store({
     state: {
-        server: "http://localhost:8081",
+        server: "http://172.16.2.39:8082",
         standalone: false 
     },
     getters: {
@@ -134,10 +134,9 @@ export default {
                 //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
 
                 let postresult = await this.newaxios.post(uri, {})
-                console.log(this)
-                console.log(this.Vue)
-                console.log('------------------')
-                console.log(postresult)
+                this.$log.debug(this.Vue)
+                this.$log.debug('------------------')
+                this.$log.debug(postresult)
 
                 if (postresult.status == 200 && postresult.data.success) {
 
@@ -151,8 +150,8 @@ export default {
 
                 }
             } catch (e) {
-                console.log(e)
-                console.log(e.response)
+                this.$log.debug(e)
+                this.$log.debug(e.response)
                 this.showTabs = false
                 this.showUserlogin = true
             }
@@ -171,7 +170,7 @@ export default {
                 username: localStorage.username
             })
 
-            console.log(postresult)
+            this.$log.debug(postresult)
 
             if (postresult.status == 200 && postresult.data.success) {
 

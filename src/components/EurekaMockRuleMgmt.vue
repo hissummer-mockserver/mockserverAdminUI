@@ -209,7 +209,7 @@ export default {
         },
 
         changeEnable: async function (status, params) {
-            console.log(status)
+            this.$log.debug(status)
             this.addRule = params.row
             this.addRule.update = true
             if (params.row.enable) {
@@ -245,7 +245,7 @@ export default {
 
             let postresult = await this.newaxios.post(uri, requestBody);
 
-            console.log(postresult.data.data);
+            this.$log.debug(postresult.data.data);
             if (postresult.data.data != null) {
                 this.mockRulesTotalSize = postresult.data.data.totalElements;
                 this.data = postresult.data.data.content;
@@ -297,7 +297,7 @@ export default {
             try {
                 let postresult = await this.newaxios.post(uri, this.addRule);
 
-                console.log(postresult);
+                this.$log.debug(postresult);
 
                 if (postresult.data.success) {
                     await this.queryMockRules();

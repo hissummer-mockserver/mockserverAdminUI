@@ -335,7 +335,7 @@ export default {
           key: "createTime",
           render: (h, params) => {
             let date = new Date(parseInt(params.row.createTime));
-            //console.log(params)
+            //this.$log.debug(params)
             return h(
               "span",
               {},
@@ -620,7 +620,7 @@ export default {
       this.queryRequestlogs(this.querylogByUri, this.querylogByHostName);
     },
     changeRequestLogPageNumber: async function (number) {
-      console.log("------- " + number);
+      this.$log.debug("------- " + number);
       this.requestlogPageNumber = number;
       this.queryRequestlogs(this.querylogByUri, this.querylogByHostName);
     },
@@ -628,7 +628,7 @@ export default {
 	this.requestlogdata = [];
        this.requestlogPageNumber = 1;
        this.requestlogPageSize = 7;
-       this.queryRequestlogs(mockRuleUri, querylogByHostName);
+       this.queryRequestlogs(mockRuleUri, mockRuleHostName);
     },
 
     changePageSize: async function (size) {
@@ -640,7 +640,7 @@ export default {
       this.queryMockRules();
     },
     queryMockRules: async function () {
-      console.log(this);
+      this.$log.debug(this);
       let uri = this.server + "/api/mock/2.0/queryRule" + "";
 
       let requestBody = {
@@ -653,7 +653,7 @@ export default {
 
       let postresult = await this.newaxios.post(uri, requestBody);
 
-      console.log(postresult.data.data);
+      this.$log.debug(postresult.data.data);
       if (postresult.data.data != null) {
         this.mockRulesTotalSize = postresult.data.data.totalElements;
         this.data = postresult.data.data.content;
@@ -679,7 +679,7 @@ export default {
 
       let postresult = await this.newaxios.post(uri, requestBody);
 
-      console.log(postresult);
+      this.$log.debug(postresult);
       if (postresult.data.data != null && postresult.data.data != undefined) {
         this.requestlogTotalSize = postresult.data.data.totalElements;
         this.requestlogdata = postresult.data.data.content;
@@ -768,7 +768,7 @@ export default {
 
       let postresult = await this.newaxios.post(uri, postBody);
 
-      console.log(postresult.data.data);
+      this.$log.debug(postresult.data.data);
 
       if (postresult.data.success) {
         await this.queryMockRules();

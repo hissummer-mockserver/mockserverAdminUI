@@ -52,7 +52,7 @@ export default {
                 password: this.password
             })
 
-            console.log(postresult)
+            this.$log.debug(postresult)
 
             if (postresult.status == 200 && postresult.data.success) {
 

@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@dreipol/vue-log": "0.0.8",
     "acorn": "6.4.1",
     "axios": "^0.19.0",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
@@ -19,6 +20,7 @@
     "vue": "^2.6.10",
     "vue-axios": "^2.1.4",
     "vue-nav-tabs": "^0.5.7",
+    "vuejs-logger": "1.5.5",
     "vuex": "^3.1.1"
   },
   "devDependencies": {

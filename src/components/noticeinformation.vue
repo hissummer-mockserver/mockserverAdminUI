@@ -30,7 +30,7 @@ export default {
     },
     methods: {
         showalert(alert, message) {
-            console.log(alert + ':' + message);
+            this.$log.debug(alert + ':' + message);
             this.alert.success.display = false;
             this.alert.warning.display = false;
             this.alert.error.display = false;
