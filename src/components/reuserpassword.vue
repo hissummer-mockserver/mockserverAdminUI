@@ -68,7 +68,7 @@ export default {
                 newpassword: this.newpassword
             })
 
-            console.log(postresult)
+            this.$log.debug(postresult)
 
             if (postresult.status == 200 && postresult.data.success) {
 

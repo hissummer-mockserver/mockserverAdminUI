@@ -6,9 +6,9 @@
             <Dropdown>
 
                 <a style="color:white;">{{loginName}}</a>
-
                 <DropdownMenu slot="list">
                     <DropdownItem v-if="!showTabs"><span @click="showtabs">rule Management</span></DropdownItem>
+                    <DropdownItem v-if="!showTabs"><span @click="showtabs">category Management</span></DropdownItem>
                     <DropdownItem><span @click="showchangePasswordForm">change Password</span></DropdownItem>
                     <DropdownItem><span @click="logout">logout</span></DropdownItem>
 
@@ -32,7 +32,7 @@
                 </TabPane>
             </Tabs>
         </div>
-        <div v-if="!showUserlogin && !showTabs">
+        <div v-if="!showUserlogin && !showTabs && !showrepassword">
             <div>Loading...</div>
         </div>
         <div v-if="showUserlogin">
