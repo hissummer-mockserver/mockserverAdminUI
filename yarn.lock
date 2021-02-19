@@ -8085,7 +8085,7 @@ vue@2.6.11, vue@^2.6.10:
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.11.tgz#76594d877d4b12234406e84e35275c6d514125c5"
   integrity sha512-VfPwgcGABbGAue9+sfrD4PuwFar7gPb1yl1UK1MwXoQPAw0BKSqWfoYCT/ThFrdEVWoI51dBuyCoiNU9bZDZxQ==
 
-vuejs-logger@1.5.5:
+vuejs-logger@^1.5.5:
   version "1.5.5"
   resolved "https://registry.yarnpkg.com/vuejs-logger/-/vuejs-logger-1.5.5.tgz#25cc0905341eaf19c22480505ee94f4a9dd93275"
   integrity sha512-wESz1F4KWk98YANEDg2yeS+fpwk2WrR41ZslLfZgTD+EYFm/7VMMUjRThhHT8CCOLOCQdsS4Ge2C9bIs68v8Ww==

@@ -1,16 +1,18 @@
 <template>
   <div>
     <Divider>Http Mock Rule 管理</Divider>
-    <Input
-      class="input"
-      v-model="category"
-      placeholder="分组"
-      style="width: 300px"
-    />
+    <Select v-model="category" placeholder="请选择分组（不选择则搜索全部）" clearable style="width: 300px">
+      <Option
+        v-for="item in categories"
+        :value="item.category"
+        :key="item.category"
+        >{{ item.category }}</Option
+      >
+    </Select>
     <Input
       class="input"
       v-model="hostName"
-      placeholder="hostName: 例如*"
+      placeholder="hostName: 支持模糊匹配, *代表全部"
       style="width: 300px"
     />
     <Input
@@ -46,6 +48,29 @@
     >
       <div style="text-align: left; line-break: anywhere">
         {{ testMockRuleResponse }}
+      </div>
+      <div slot="footer"></div>
+    </Modal>
+
+    <Modal
+      width="500px"
+      :mask-closable="false"
+      v-model="addCategoryModal"
+      title="分组管理"
+    >
+      <div style="text-align: left; line-break: anywhere">
+        <Table border :columns="categoryColumns" :data="categories"></Table>
+        <Page
+          class="page"
+          :total="categoryTotalSize"
+          :current="categoryPageNumber"
+          show-total
+          show-sizer
+          :page-size-opts="[10, 20, 30]"
+          :page-size="10"
+          @on-change="changeCategoryPageNumber($event)"
+          @on-page-size-change="changeCategoryPageSize($event)"
+        />
       </div>
       <div slot="footer"></div>
     </Modal>
@@ -88,11 +113,18 @@
     >
       <div>
         <span class="modalInputLabel">分组:</span>
-        <Input
-          v-model="addRule.category"
-          placeholder="mock规则的分组"
-          style="width: 400px"
-        />
+
+        <Select v-model="addRule.category" style="width: 300px">
+          <Option
+            v-for="item in categories"
+            :value="item.category"
+            :key="item.category"
+            >{{ item.category }}</Option
+          >
+        </Select>
+        <Button class="button" type="primary" @click="openCategoryMgmtModal"
+          >分组管理</Button
+        >
       </div>
 
       <div>
@@ -274,9 +306,11 @@ import lodash from "lodash";
 export default {
   created: function () {
     this.queryMockRules();
+    this.queryCategories();
   },
   data() {
     return {
+      addCategoryModal: false,
       testMockRuleModal: false,
       querylogModal: false,
       querylogByHostName: "",
@@ -287,12 +321,16 @@ export default {
       category: "",
       requestUri: null,
       mockRulesTotalSize: 0,
+      categoryTotalSize: 0,
       requestlogTotalSize: 0,
       pageSize: 10,
       pageNumber: 1,
+      categoryPageSize: 10,
+      categoryPageNumber: 1,
       requestlogPageSize: 7,
       requestlogPageNumber: 1,
       modalTitle: "",
+      categories: [],
       workModeOption: [
         {
           value: "MOCK",
@@ -327,6 +365,37 @@ export default {
       update: null,
       addRuleModal: false,
       deleteRuleModal: false,
+      categoryColumns: [
+        { title: "category", key: "category" },
+        { title: "description", key: "description" },
+        {
+          title: "操作",
+          key: "action",
+          align: "center",
+          render:(h, params) => {
+          return  h("div", [
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "error",
+                    size: "small",
+                  },
+                  style: {
+                    margin: "5px",
+                  },
+                  on: {
+                    click: () => {
+                      this.deleteCategory(params);
+                    },
+                  },
+                },
+                "删除"
+              ),
+            ]);
+          },
+        },
+      ],
       requestlogdata: [],
       requestlogcolumns: [
         {
@@ -434,6 +503,44 @@ export default {
     };
   },
   methods: {
+                error (title,nodesc) {
+                this.$Notice.error({
+                    title: title,
+                    desc: nodesc 
+                });
+            },
+    openCategoryMgmtModal: function () {
+      this.addCategoryModal = true;
+    },
+    queryCategories: async function () {
+      let uri = this.server + "/api/mock/2.0/queryCategory" + "";
+
+      let requestBody = {};
+
+      let postresult = await this.newaxios.post(uri, requestBody);
+
+      this.$log.debug("query category: ", postresult.data.data);
+      if (postresult.data.data != null) {
+        this.categories = postresult.data.data;
+      } else {
+      }
+    },
+    addCategories: async function (category, description, parent) {
+      let uri = this.server + "/api/mock/2.0/addCategory";
+
+      let requestBody = {
+        category: category,
+        description: description,
+        parent: parent,
+      };
+
+      let postresult = await this.newaxios.post(uri, requestBody);
+
+      this.$log.debug(postresult.data.data);
+      if (postresult.data.data != null) {
+      } else {
+      }
+    },
     renderUpstreamNodes: function (h, params) {
       let upstreamNodes = "N/A";
       if (params.row.workMode == "UPSTREAM") {
@@ -624,12 +731,12 @@ export default {
       this.requestlogPageNumber = number;
       this.queryRequestlogs(this.querylogByUri, this.querylogByHostName);
     },
-        queryRequestLogfirstPage:async function(mockRuleUri, mockRuleHostName){
-	this.requestlogdata = [];
-  this.requestlogTotalSize = 0;
-       this.requestlogPageNumber = 1;
-       this.requestlogPageSize = 7;
-       this.queryRequestlogs(mockRuleUri, mockRuleHostName);
+    queryRequestLogfirstPage: async function (mockRuleUri, mockRuleHostName) {
+      this.requestlogdata = [];
+      this.requestlogTotalSize = 0;
+      this.requestlogPageNumber = 1;
+      this.requestlogPageSize = 7;
+      this.queryRequestlogs(mockRuleUri, mockRuleHostName);
     },
 
     changePageSize: async function (size) {
@@ -684,8 +791,10 @@ export default {
       if (postresult.data.data != null && postresult.data.data != undefined) {
         this.requestlogTotalSize = postresult.data.data.totalElements;
         this.requestlogdata = postresult.data.data.content;
-      } else 
-      { this.requestlogdata = []; this.requestlogTotalSize = 0; }
+      } else {
+        this.requestlogdata = [];
+        this.requestlogTotalSize = 0;
+      }
     },
     emptyMockRuleData: function () {
       this.addRule.id = null;
@@ -772,6 +881,7 @@ export default {
       this.$log.debug(postresult.data.data);
 
       if (postresult.data.success) {
+        this.queryCategories();
         await this.queryMockRules();
         this.$refs.noticeinformation.showalert("success", "添加/修改成功");
       } else {
@@ -779,6 +889,17 @@ export default {
           "error",
           "添加/修改失败:" + postresult.data.message
         );
+      }
+    },
+    deleteCategory:async function(params){
+      let uri = this.server + "/api/mock/2.0/deleteCategory" + "";
+      let postresult = await this.newaxios.post(uri, {
+        id: params.row.id,
+      });
+      if (postresult.data.success) {
+        this.queryCategories();
+      }else{
+        this.error('Failed',postresult.data.message);
       }
     },
     deleteOk: async function () {

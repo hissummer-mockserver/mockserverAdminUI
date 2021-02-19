@@ -318,7 +318,7 @@ export default {
         },
         deleteOk: async function () {
             let uri = this.server + "/api/mock/2.0/deleteEurekaRule" + '';
-            let postresult = await this.axios.post(uri, {
+            let postresult = await this.newaxios.post(uri, {
                 id: this.addRule.id
             });
             if (postresult.data.success) {
