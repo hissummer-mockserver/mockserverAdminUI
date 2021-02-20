@@ -1,14 +1,24 @@
 <template>
   <div>
     <Divider>Http Mock Rule 管理</Divider>
-    <Select v-model="category" placeholder="请选择分组（不选择则搜索全部）" clearable style="width: 300px">
+
+    <div style="display:inline-block;text-align: left;">
+    <Select v-model="category" filterable placeholder="请选择分组（不选择则搜索全部）" clearable style="width: 300px">
       <Option
         v-for="item in categories"
         :value="item.category"
         :key="item.category"
-        >{{ item.category }}</Option
+        :label="item.category"
+        >
+        
+        <span >{{ item.category }}</span>
+            <span style="float:right;color:#ccc">{{ item.description }}</span>
+
+        </Option
       >
     </Select>
+    </div>
+
     <Input
       class="input"
       v-model="hostName"
@@ -58,20 +68,50 @@
       v-model="addCategoryModal"
       title="分组管理"
     >
-      <div style="text-align: left; line-break: anywhere">
-        <Table border :columns="categoryColumns" :data="categories"></Table>
-        <Page
-          class="page"
-          :total="categoryTotalSize"
-          :current="categoryPageNumber"
-          show-total
-          show-sizer
-          :page-size-opts="[10, 20, 30]"
-          :page-size="10"
-          @on-change="changeCategoryPageNumber($event)"
-          @on-page-size-change="changeCategoryPageSize($event)"
-        />
+
+      <Divider orientation="left">添加category(分组)</Divider>
+
+     <Input
+      class="input"
+      v-model="toBeAddCategory.category"
+      placeholder="category name"
+      style="width: 300px"
+    />
+
+    <Input
+      class="input"
+      v-model="toBeAddCategory.description"
+      placeholder="description"
+      style="width: 300px"
+    />
+    <Button  class="button" type="primary" @click="addCategory()">添加</Button>
+
+
+    <div v-if="!isAddCategory"> 
+      <Divider orientation="left">更新category(分组)</Divider>
+原Category(分组)的名字:  {{originalCategory.category}}
+     <Input
+      class="input"
+      v-model="toBeUpdateCategory.category"
+      placeholder="category name"
+      style="width: 300px"
+    />
+
+    <Input
+      class="input"
+      v-model="toBeUpdateCategory.description"
+      placeholder="description"
+      style="width: 300px"
+    />
+    <Button v-if="!isAddCategory" class="button" type="primary" @click="updateCategory()">修改</Button>
+
       </div>
+
+      <div style="margin-top:10px; text-align: left; line-break: anywhere">
+        <Table border :columns="categoryColumns" :data="categories"></Table>
+      </div>
+
+
       <div slot="footer"></div>
     </Modal>
 
@@ -114,14 +154,20 @@
       <div>
         <span class="modalInputLabel">分组:</span>
 
-        <Select v-model="addRule.category" style="width: 300px">
-          <Option
-            v-for="item in categories"
-            :value="item.category"
-            :key="item.category"
-            >{{ item.category }}</Option
-          >
-        </Select>
+    <Select v-model="addRule.category" filterable placeholder="请选择分组（不选择则搜索全部）" clearable style="width: 300px">
+      <Option
+        v-for="item in categories"
+        :value="item.category"
+        :key="item.category"
+        :label="item.category"
+        >
+        
+        <span >{{ item.category }}</span>
+        <span style="float:right;color:#ccc">{{ item.description }}</span>
+
+        </Option
+      >
+    </Select>
         <Button class="button" type="primary" @click="openCategoryMgmtModal"
           >分组管理</Button
         >
@@ -310,6 +356,16 @@ export default {
   },
   data() {
     return {
+      isAddCategory:true,
+      toBeAddCategory:{
+        category:null,
+        description:null
+      },
+      toBeUpdateCategory:{
+        category:null,
+        description:null
+      },      
+      originalCategory:null,
       addCategoryModal: false,
       testMockRuleModal: false,
       querylogModal: false,
@@ -374,6 +430,24 @@ export default {
           align: "center",
           render:(h, params) => {
           return  h("div", [
+             h(
+                "Button",
+                {
+                  props: {
+                    type: "primary",
+                    size: "small",
+                  },
+                  style: {
+                    margin: "5px",
+                  },
+                  on: {
+                    click: () => {
+                      this.showUpdateCategoryInfo(params);
+                    },
+                  },
+                },
+                "修改"
+              ),
               h(
                 "Button",
                 {
@@ -391,7 +465,7 @@ export default {
                   },
                 },
                 "删除"
-              ),
+              ),             
             ]);
           },
         },
@@ -503,14 +577,45 @@ export default {
     };
   },
   methods: {
-                error (title,nodesc) {
+    updateCategory:async function(){
+      let uri = this.server + "/api/mock/2.0/updateCategory";
+
+      let requestBody = this.toBeUpdateCategory;
+
+      requestBody.id = this.originalCategory.id;
+
+      let postresult = await this.newaxios.post(uri, requestBody);
+
+      this.$log.debug(postresult.data.data);
+      if (postresult.data.data != null) {
+        this.info("Update Category","Success!");
+        this.isAddCategory = true;
+        this.queryCategories();
+      } else {
+        this.error("Update Category",postresult.data.message);
+
+      }
+    },
+    showUpdateCategoryInfo:function(params){
+      this.isAddCategory = false;
+      this.originalCategory = params.row;
+      this.toBeUpdateCategory = lodash.cloneDeep(this.originalCategory);
+    },
+      error (title,nodesc) {
                 this.$Notice.error({
                     title: title,
                     desc: nodesc 
                 });
             },
+      info (title,nodesc) {
+                this.$Notice.info({
+                    title: title,
+                    desc: nodesc 
+                });
+            },            
     openCategoryMgmtModal: function () {
       this.addCategoryModal = true;
+      this.isAddCategory = true;
     },
     queryCategories: async function () {
       let uri = this.server + "/api/mock/2.0/queryCategory" + "";
@@ -523,22 +628,26 @@ export default {
       if (postresult.data.data != null) {
         this.categories = postresult.data.data;
       } else {
+        this.error("Query Category",postresult.data.message);
+
       }
     },
-    addCategories: async function (category, description, parent) {
+    addCategory: async function () {
       let uri = this.server + "/api/mock/2.0/addCategory";
 
-      let requestBody = {
-        category: category,
-        description: description,
-        parent: parent,
-      };
+      let requestBody = this.toBeAddCategory;
 
       let postresult = await this.newaxios.post(uri, requestBody);
 
       this.$log.debug(postresult.data.data);
       if (postresult.data.data != null) {
+        this.info("Add Category","Success!");
+        this.toBeAddCategory.category = null;
+        this.toBeAddCategory.description = null;
+        this.queryCategories();
       } else {
+        this.error("Add Category",postresult.data.message);
+
       }
     },
     renderUpstreamNodes: function (h, params) {
@@ -897,9 +1006,10 @@ export default {
         id: params.row.id,
       });
       if (postresult.data.success) {
+        this.info('Delete category',"Success.");
         this.queryCategories();
       }else{
-        this.error('Failed',postresult.data.message);
+        this.error('Delete category',postresult.data.message);
       }
     },
     deleteOk: async function () {
