@@ -129,7 +129,7 @@ export default {
             try {
                 let uri
 
-                uri = this.server + "/api/mock/2.0/isLogin"
+                uri = this.server + "/xxxxhissummerxxxx/api/isLogin"
 
                 //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
 
@@ -162,7 +162,7 @@ export default {
 
             let uri
 
-            uri = this.server + "/api/mock/2.0/logout"
+            uri = this.server + "/xxxxhissummerxxxx/api/logout"
 
             //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
 

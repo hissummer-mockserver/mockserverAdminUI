@@ -578,7 +578,7 @@ export default {
   },
   methods: {
     updateCategory:async function(){
-      let uri = this.server + "/api/mock/2.0/updateCategory";
+      let uri = this.server + "/xxxxhissummerxxxx/api/updateCategory";
 
       let requestBody = this.toBeUpdateCategory;
 
@@ -618,7 +618,7 @@ export default {
       this.isAddCategory = true;
     },
     queryCategories: async function () {
-      let uri = this.server + "/api/mock/2.0/queryCategory" + "";
+      let uri = this.server + "/xxxxhissummerxxxx/api/queryCategory" + "";
 
       let requestBody = {};
 
@@ -633,7 +633,7 @@ export default {
       }
     },
     addCategory: async function () {
-      let uri = this.server + "/api/mock/2.0/addCategory";
+      let uri = this.server + "/xxxxhissummerxxxx/api/addCategory";
 
       let requestBody = this.toBeAddCategory;
 
@@ -858,7 +858,7 @@ export default {
     },
     queryMockRules: async function () {
       this.$log.debug(this);
-      let uri = this.server + "/api/mock/2.0/queryRule" + "";
+      let uri = this.server + "/xxxxhissummerxxxx/api/queryRule" + "";
 
       let requestBody = {
         category: this.category,
@@ -885,7 +885,7 @@ export default {
       this.querylogByUri = mockRuleRri;
       this.querylogModal = true;
 
-      let uri = this.server + "/api/mock/2.0/queryRequestLog" + "";
+      let uri = this.server + "/xxxxhissummerxxxx/api/queryRequestLog" + "";
 
       let requestBody = {
         uri: mockRuleRri,
@@ -976,8 +976,8 @@ export default {
       let uri;
 
       if (!this.addRule.update)
-        uri = this.server + "/api/mock/2.0/addRule" + "";
-      else uri = this.server + "/api/mock/2.0/updateRule" + "";
+        uri = this.server + "/xxxxhissummerxxxx/api/addRule" + "";
+      else uri = this.server + "/xxxxhissummerxxxx/api/updateRule" + "";
 
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
 
@@ -1001,7 +1001,7 @@ export default {
       }
     },
     deleteCategory:async function(params){
-      let uri = this.server + "/api/mock/2.0/deleteCategory" + "";
+      let uri = this.server + "/xxxxhissummerxxxx/api/deleteCategory" + "";
       let postresult = await this.newaxios.post(uri, {
         id: params.row.id,
       });
@@ -1013,7 +1013,7 @@ export default {
       }
     },
     deleteOk: async function () {
-      let uri = this.server + "/api/mock/2.0/deleteRule" + "";
+      let uri = this.server + "/xxxxhissummerxxxx/api/deleteRule" + "";
       let postresult = await this.newaxios.post(uri, {
         id: this.addRule.id,
       });
@@ -1029,7 +1029,7 @@ export default {
     },
     cancel: async function () {},
     testMockRule: async function () {
-      let uri = this.server + "/api/mock/2.0/testRule" + "";
+      let uri = this.server + "/xxxxhissummerxxxx/api/testRule" + "";
       let postBody = lodash.cloneDeep(this.addRule);
 
       postBody.responseHeaders = JSON.parse(postBody.responseHeaders); // 将字符串转换为json object

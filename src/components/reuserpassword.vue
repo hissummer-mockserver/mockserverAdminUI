@@ -58,7 +58,7 @@ export default {
 
             let uri
 
-            uri = this.server + "/api/mock/2.0/rePassword"
+            uri = this.server + "/xxxxhissummerxxxx/api/rePassword"
 
             //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
 

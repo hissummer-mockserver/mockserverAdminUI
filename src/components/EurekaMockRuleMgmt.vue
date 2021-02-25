@@ -234,7 +234,7 @@ export default {
             this.queryMockRules();
         },
         queryMockRules: async function () {
-            let uri = this.server + "/api/mock/2.0/queryEurekaRule" + '';
+            let uri = this.server + "/xxxxhissummerxxxx/api/queryEurekaRule" + '';
 
             let requestBody = {
                 eurekaServer: this.eurekaServerAddress,
@@ -290,8 +290,8 @@ export default {
             let uri;
 
             if (!this.addRule.update)
-                uri = this.server + "/api/mock/2.0/addEurekaRule" + '';
-            else uri = this.server + "/api/mock/2.0/updateEurekaRule" + '';
+                uri = this.server + "/xxxxhissummerxxxx/api/addEurekaRule" + '';
+            else uri = this.server + "/xxxxhissummerxxxx/api/updateEurekaRule" + '';
 
             //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
             try {
@@ -317,7 +317,7 @@ export default {
 
         },
         deleteOk: async function () {
-            let uri = this.server + "/api/mock/2.0/deleteEurekaRule" + '';
+            let uri = this.server + "/xxxxhissummerxxxx/api/deleteEurekaRule" + '';
             let postresult = await this.newaxios.post(uri, {
                 id: this.addRule.id
             });
