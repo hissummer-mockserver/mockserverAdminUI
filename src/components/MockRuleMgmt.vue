@@ -339,8 +339,10 @@
         />
       </div>
     </Modal>
-
     <!-- end of the delete modal -->
+
+<conditionRuleMgmtModal v-if="ifShowConditionalRuleMgmtModal" v-bind:show-modal="ifShowConditionalRuleMgmtModal" v-bind:condition-rules="conditionRules"></conditionRuleMgmtModal>
+
   </div>
 </template>
 
@@ -348,6 +350,9 @@
 //var _ = require('lodash')
 
 import lodash from "lodash";
+import Vue from "vue";
+import conditionRuleMgmtModal from "./subComponent/ConditionRuleMgmtModal.vue";
+Vue.component("conditionRuleMgmtModal", conditionRuleMgmtModal);
 
 export default {
   created: function () {
@@ -356,6 +361,8 @@ export default {
   },
   data() {
     return {
+      conditionRules:{comments:'hello',show:true},
+      ifShowConditionalRuleMgmtModal:false, //是否展示条件规则管理弹窗标志位
       isAddCategory:true,
       toBeAddCategory:{
         category:null,
@@ -429,7 +436,7 @@ export default {
           key: "action",
           align: "center",
           render:(h, params) => {
-          return  h("div", [
+          return  h("div", [     
              h(
                 "Button",
                 {
@@ -447,7 +454,7 @@ export default {
                   },
                 },
                 "修改"
-              ),
+              ),      
               h(
                 "Button",
                 {
@@ -543,29 +550,24 @@ export default {
           width: 250,
         },
         {
-          title: "工作模式",
-          width: 100,
+          title: "默认工作模式",
+          width: 120,
           key: "workMode",
         },
         {
-          title: "上游节点",
+          title: "默认上游节点",
           render: this.renderUpstreamNodes,
           width: 180,
         },
         {
-          title: "响应Headers",
-          width: 150,
-          render: this.renderMockResponseHeaders,
-        },
-        {
-          title: "响应mock报文",
+          title: "默认响应mock报文",
           key: "mockResponse",
           render: this.renderMockResponseColumn,
         },
         {
           title: "操作",
           key: "action",
-          width: 200,
+          width: 300,
           align: "center",
           render: this.renderActionColumn,
         },
@@ -577,6 +579,17 @@ export default {
     };
   },
   methods: {
+    /**
+     * 打开条件规则管理弹窗
+     */
+    showConditionalRuleMgmtModal:function(params){
+
+      this.conditionRules.show = true;
+      this.conditionRules.params = params;
+      this.$log.debug(this.conditionRules);
+      this.ifShowConditionalRuleMgmtModal = true;
+
+    },
     updateCategory:async function(){
       let uri = this.server + "/xxxxhissummerxxxx/api/updateCategory";
 
@@ -743,6 +756,24 @@ export default {
           },
           "修改"
         ),
+             h(
+                "Button",
+                {
+                  props: {
+                    type: "primary",
+                    size: "small",
+                  },
+                  style: {
+                    margin: "5px",
+                  },
+                  on: {
+                    click: () => {
+                      this.showConditionalRuleMgmtModal(params);
+                    },
+                  },
+                },
+                "编辑条件规则"
+              ),         
         h(
           "Button",
           {

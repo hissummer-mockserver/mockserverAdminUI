@@ -76,13 +76,14 @@ Vue.use(Vuex);
 
 import userlogin from "./components/userlogin.vue";
 Vue.component("userlogin", userlogin);
+
 import reuserpassword from "./components/reuserpassword.vue";
 Vue.component("reuserpassword", reuserpassword);
 
 const store = new Vuex.Store({
     state: {
         server: "http://localhost:8081",
-        standalone: false 
+        standalone: true 
     },
     getters: {
         getServer(state) {
