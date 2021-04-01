@@ -233,7 +233,7 @@
           v-model="addRule.responseHeaders"
           type="textarea"
           :rows="5"
-          placeholder="{'header1':'value1'}"
+          placeholder="{'header':'value'}"
         />
       </div>
 
@@ -1075,11 +1075,7 @@ export default {
 </script>
 
 <style scoped>
-.modalInputLabel {
-  width: 110px;
-  padding: 10px;
-  display: inline-block;
-}
+
 
 p {
   text-align: left;

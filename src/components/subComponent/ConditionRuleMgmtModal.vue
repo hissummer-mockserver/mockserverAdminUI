@@ -7,45 +7,42 @@
       v-model="conditionRules.show"
       title="条件规则管理"
     >
-      <div>
-        Mock规则【{{
+      <div class="modalElementGroup">
+        Mock规则Id:【{{
           conditionRules.params == undefined
             ? ""
             : conditionRules.params.row.id
         }}】
-        <span class="modalInputLabel">请求Host:</span>
-        <span
-          >【{{
+       请求Host:
+【{{
             conditionRules.params == undefined
               ? ""
               : conditionRules.params.row.host
-          }}】</span
-        >
-        <span class="modalInputLabel">请求Uri:</span>
-        <span
-          >【{{
+          }}】
+        请求Uri:
+        【{{
             conditionRules.params == undefined
               ? ""
               : conditionRules.params.row.uri
-          }}】</span
-        >
+          }}】
+
         下的条件规则列表：
       </div>
 
-      <Button type="info" @click="queryConditionRulesByMockId(conditionRules.params == undefined
+      <Button class="modalElementGroup" type="info" @click="queryConditionRulesByMockId(conditionRules.params == undefined
             ? ''
             : conditionRules.params.row.id)"
         >查询</Button
       >
 
-      <Button type="info" @click="showAddConditionRuleModal = true"
+      <Button class="modalElementGroup" type="info" @click="showAddConditionRuleModal = true"
         >添加</Button
       >
 
-      <Button type="info" @click="deleteConditionRulesByMockId(conditionRules.params == undefined
+      <Button class="modalElementGroup" type="info" @click="deleteConditionRulesByMockId(conditionRules.params == undefined
             ? ''
             : conditionRules.params.row.id)"
-        >删除</Button>
+        >清空</Button>
 
       <Table
         border
@@ -78,10 +75,9 @@
       @on-ok="addOk"
       @on-cancel="addCancel"
     >
-      <div>
+      <div class="modalElementGroup">
         <span class="modalInputLabel">条件组合:</span>
-
-        <div
+        <div class="modalElementGroup"
           v-for="(
             expression, index
           ) in tobeAddedConditionRule.conditionExpression"
@@ -90,11 +86,11 @@
           <Input
             v-if="!isSpecialConditionExpression(expression.compareCondition)"
             v-model="expression.toBeCompareValue"
-            style="width: 260px"
+            style="width: 255px"
           />
                   <Select
           v-model="expression.compareCondition"
-          style="width: 150px"
+          style="width: 145px"
         >
           <Option
             v-for="item in conditionExpression"
@@ -107,7 +103,7 @@
           <Input
             v-if="!isSpecialConditionExpression(expression.compareCondition)"
             v-model="expression.conditionValue"
-            style="width: 260px"
+            style="width: 255px"
           />
 
               <Button type="info" @click="addOrDeleteCondition(index)"
@@ -117,7 +113,7 @@
         </div>
       </div>
 
-      <div>
+      <div class="modalElementGroup">
         <span class="modalInputLabel">工作模式:</span>
         <Select
           v-model="tobeAddedConditionRule.workMode"
@@ -133,7 +129,7 @@
         </Select>
       </div>
 
-      <div v-if="tobeAddedConditionRule.workMode != 'MOCK'">
+      <div class="modalElementGroup" v-if="tobeAddedConditionRule.workMode != 'MOCK'">
         <div class="nextedForm">
           <span class="modalInputLabel">上游服务: </span>
 
@@ -156,7 +152,7 @@
         </div>
       </div>
 
-      <div v-if="tobeAddedConditionRule.workMode == 'MOCK'">
+      <div class="modalElementGroup" v-if="tobeAddedConditionRule.workMode == 'MOCK'">
         <span class="modalInputLabel">响应Headers:</span>
         <Input
           v-model="tobeAddedConditionRule.responseHeaders"
@@ -164,6 +160,9 @@
           :rows="5"
           placeholder="{'header':'value'}"
         />
+        </div>
+
+              <div class="modalElementGroup" v-if="tobeAddedConditionRule.workMode == 'MOCK'">
         <span class="modalInputLabel">响应Mock报文:</span>
         <Input
           v-model="tobeAddedConditionRule.mockResponse"
@@ -171,7 +170,8 @@
           :rows="10"
           placeholder="mock response body"
         />
-      </div>
+              </div>
+
     </Modal>
 
     <!-- end of the add condition rule modal -->
@@ -509,4 +509,8 @@ deleteConditionRulesByMockId:async function(mockRuleId){
 </script>
 
 <style scoped>
+.modalElementGroup{
+  margin:5px;
+
+}
 </style>

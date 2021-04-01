@@ -8,7 +8,6 @@
                 <a style="color:white;">{{loginName}}</a>
                 <DropdownMenu slot="list">
                     <DropdownItem v-if="!showTabs"><span @click="showtabs">rule Management</span></DropdownItem>
-                    <DropdownItem v-if="!showTabs"><span @click="showtabs">category Management</span></DropdownItem>
                     <DropdownItem><span @click="showchangePasswordForm">change Password</span></DropdownItem>
                     <DropdownItem><span @click="logout">logout</span></DropdownItem>
 
@@ -47,7 +46,7 @@
 
     <Divider></Divider>
     <div style="text-align:center;margin:20px;font-size:1.5em;">
-        <a href="http://qa.heika.com" target="_blank">Mockserver v0.0.5</a> |
+        <a href="http://qa.heika.com" target="_blank">Mockserver v0.0.6</a> |
         <a href="https://mockserver.hissummer.com/" target="_blank">使用帮助</a>
     </div>
 
@@ -83,7 +82,7 @@ Vue.component("reuserpassword", reuserpassword);
 const store = new Vuex.Store({
     state: {
         server: "http://localhost:8081",
-        standalone: true 
+        standalone: false 
     },
     getters: {
         getServer(state) {
@@ -256,5 +255,11 @@ export default {
 </style><style>
 .ivu-tabs-card {
     padding-bottom: 78px;
+}
+.modalInputLabel {
+  width: 110px;
+  padding: 10px;
+  display: inline-block;
+  font-weight:700;
 }
 </style>
