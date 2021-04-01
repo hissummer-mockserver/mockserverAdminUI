@@ -341,7 +341,7 @@
     </Modal>
     <!-- end of the delete modal -->
 
-<conditionRuleMgmtModal v-if="ifShowConditionalRuleMgmtModal" v-bind:show-modal="ifShowConditionalRuleMgmtModal" v-bind:condition-rules="conditionRules"></conditionRuleMgmtModal>
+<conditionRuleMgmtModal  v-bind:condition-rules="conditionRules"></conditionRuleMgmtModal>
 
   </div>
 </template>
@@ -361,7 +361,7 @@ export default {
   },
   data() {
     return {
-      conditionRules:{comments:'hello',show:true},
+      conditionRules:{show:false},
       ifShowConditionalRuleMgmtModal:false, //是否展示条件规则管理弹窗标志位
       isAddCategory:true,
       toBeAddCategory:{
@@ -584,8 +584,8 @@ export default {
      */
     showConditionalRuleMgmtModal:function(params){
 
-      this.conditionRules.show = true;
       this.conditionRules.params = params;
+      this.conditionRules.show = true;
       this.$log.debug(this.conditionRules);
       this.ifShowConditionalRuleMgmtModal = true;
 

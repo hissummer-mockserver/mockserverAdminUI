@@ -90,11 +90,11 @@
           <Input
             v-if="!isSpecialConditionExpression(expression.compareCondition)"
             v-model="expression.toBeCompareValue"
-            style="width: 50px"
+            style="width: 260px"
           />
                   <Select
           v-model="expression.compareCondition"
-          style="width: 200px"
+          style="width: 150px"
         >
           <Option
             v-for="item in conditionExpression"
@@ -107,8 +107,13 @@
           <Input
             v-if="!isSpecialConditionExpression(expression.compareCondition)"
             v-model="expression.conditionValue"
-            style="width: 50px"
+            style="width: 260px"
           />
+
+              <Button type="info" @click="addOrDeleteCondition(index)"
+        >{{index == 0 ?'+':'-'}}</Button
+      >
+
         </div>
       </div>
 
@@ -201,11 +206,11 @@ export default {
       conditionExpression: [
         {
           value: "EQUAL",
-          label: "EQUAL",
+          label: "==",
         },
         {
           value: "NON_EQUAL",
-          label: "NON_EQUAL",
+          label: "!=",
         },
         {
           value: "REGREX_MATCH",
@@ -213,19 +218,19 @@ export default {
         },
         {
           value: "GREATER_THAN",
-          label: "GREATER_THAN",
+          label: ">",
         },
         {
           value: "GREATER_OR_EQUAL",
-          label: "GREATER_OR_EQUAL",
+          label: ">=",
         },
         {
           value: "LESS_THAN",
-          label: "LESS_THAN",
+          label: "<",
         },
         {
           value: "LESS_OR_EQUAL",
-          label: "LESS_OR_EQUAL",
+          label: "<=",
         },
         {
           value: "LEFT_PARENTHESIS",
@@ -299,7 +304,7 @@ export default {
         workMode: "MOCK",
         enable: true,
       },
-      httpConditionRule: {
+      httpConditionRuleDetails: {
         //httpconditionrule schema
         id: null,
         httpMockRuleId: null,
@@ -362,17 +367,32 @@ export default {
 
     changeWorkMode: function () {},
     isSpecialConditionExpression: function (expression) {
+
       return (
-        expression == "(" ||
-        expression == ")" ||
-        expression == "or" ||
-        expression == "and"
+        expression == "LEFT_PARENTHESIS" ||
+        expression == "RIGHT_PARENTHESIS" ||
+        expression == "OR" ||
+        expression == "AND"
       );
     },
+    addOrDeleteCondition:function(index){
+      if(index == 0)
+      {
+      this.tobeAddedConditionRule.conditionExpression.push({
+            toBeCompareValue: "",
+            compareCondition: "",
+            conditionValue: "",
+          });
+      }
+      else{
+        this.tobeAddedConditionRule.conditionExpression.splice(index,1);
+      }
+
+    },
     addOk: async function () {
-      this.httpConditionRule.httpMockRuleId = this.conditionRules.params.row.id;
+      this.httpConditionRuleDetails.httpMockRuleId = this.conditionRules.params.row.id;
       this.tobeAddedConditionRule.orderId =
-        this.httpConditionRule.conditionRules.length + 1;
+        this.httpConditionRuleDetails.conditionRules.length + 1;
       try {
         this.tobeAddedConditionRule.responseHeaders = JSON.parse(
           this.tobeAddedConditionRule.responseHeaders
@@ -380,20 +400,20 @@ export default {
       } catch (e) {
         this.tobeAddedConditionRule.responseHeaders = {};
       }
-      this.httpConditionRule.conditionRules.push(this.tobeAddedConditionRule);
-      this.$log.debug(this.httpConditionRule);
+      this.httpConditionRuleDetails.conditionRules.push(this.tobeAddedConditionRule);
+      this.$log.debug(this.httpConditionRuleDetails);
 
       if (
-        this.httpConditionRule.id == null ||
-        this.httpConditionRule.id == undefined ||
-        this.httpConditionRule.id == null
+        this.httpConditionRuleDetails.id == null ||
+        this.httpConditionRuleDetails.id == undefined ||
+        this.httpConditionRuleDetails.id == null
       ) {
-        await this.addNewHttpConditionRule(this.httpConditionRule);
+        await this.addNewHttpConditionRule(this.httpConditionRuleDetails);
       } else {
-        await this.updateHttpConditionRule(this.httpConditionRule);
+        await this.updateHttpConditionRule(this.httpConditionRuleDetails);
       }
 
-      this.queryConditionRulesByMockId(this.httpConditionRule.httpMockRuleId);
+      this.queryConditionRulesByMockId(this.httpConditionRuleDetails.httpMockRuleId);
     },
     addCancel: async function () {},
     changePageNumber: async function () {},
@@ -419,7 +439,7 @@ export default {
       this.$log.debug("add new rules : ", postresult);
       if (postresult.data.success) {
         this.conditionRuleListData = postresult.data.data.conditionRules;
-        this.httpConditionRule = postresult.data.data;
+        this.httpConditionRuleD = postresult.data.data;
       } else if (postresult.status != 200 || !postresult.data.success) {
         this.error("add conditionRules error: ", postresult.data.message);
       }
@@ -434,13 +454,13 @@ deleteConditionRulesByMockId:async function(mockRuleId){
         "/xxxxhissummerxxxx/api/httpConditionRule/mockRuleId-" +
         mockRuleId;
       this.$log.debug(this.newaxios);
-      let postresult = await this.newaxios.delete(uri,this.httpConditionRule);
+      let postresult = await this.newaxios.delete(uri,this.httpConditionRuleDetails);
       this.$log.debug("delete conditionrules by mockid : ", postresult);
       if (postresult.data.success) {
           this.queryConditionRulesByMockId(mockRuleId);
       } else if (postresult.status != 200 || !postresult.data.success) {
         this.conditionRuleListData = [];
-        this.httpConditionRule.conditionRules = [];
+        this.httpConditionRuleDetails.conditionRules = [];
         this.error("delete conditionRules ", postresult.data.message);
       }
 
@@ -459,16 +479,16 @@ deleteConditionRulesByMockId:async function(mockRuleId){
       this.$log.debug("query conditionrules by mockid : ", postresult);
       if (postresult.data.data != null) {
         this.conditionRuleListData = postresult.data.data.conditionRules;
-        this.httpConditionRule = postresult.data.data;
+        this.httpConditionRuleDetails = postresult.data.data;
       } 
        else if (postresult.data.data == null) {
         this.conditionRuleListData = [];
-        this.httpConditionRule.conditionRules = [];
-        this.httpConditionRule.id = null;
+        this.httpConditionRuleDetails.conditionRules = [];
+        this.httpConditionRuleDetails.id = null;
       }
       else if (postresult.status != 200 || !postresult.data.success) {
         this.conditionRuleListData = [];
-        this.httpConditionRule.conditionRules = [];
+        this.httpConditionRuleDetails.conditionRules = [];
         this.error("query conditionRules ", postresult.data.message);
       }
     },
