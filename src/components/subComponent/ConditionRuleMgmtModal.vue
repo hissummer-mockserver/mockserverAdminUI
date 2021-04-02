@@ -254,6 +254,7 @@ export default {
         {
           title: "序号",
           key: "orderId",
+          width:60
         },
 
         {
@@ -263,16 +264,22 @@ export default {
         {
           title: "模式",
           key: "workMode",
+          width:80
         },
         {
           title: "自定义响应头",
           key: "responseHeaders",
+          render:this.renderResponseHeader
         },
 
         {
           title: "响应体",
           key: "mockResponse",
         },
+        {
+          title:'操作',
+          render:this.renderActionColumn
+        }
       ],
       conditionRuleListData: [],
       server: this.$store.getters.getServer,
@@ -323,6 +330,9 @@ export default {
     },
   },
   methods: {
+    renderResponseHeader:function(h,params){
+        
+    },
     renderActionColumn: function (h, params) {
       return h("div", [
         h(
@@ -504,6 +514,7 @@ deleteConditionRulesByMockId:async function(mockRuleId){
         desc: nodesc,
       });
     },
+  
   },
 };
 </script>

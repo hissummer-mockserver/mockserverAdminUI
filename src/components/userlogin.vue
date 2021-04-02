@@ -4,13 +4,13 @@
     <noticeinformation ref="noticeinformation"></noticeinformation>
 
     <div v-if="showloginform" class="loginform">
-        <div class="modalInputLabel">
-            <span class="modalInputLabel">username:</span>
+        <div class="loginform">
+            <span class="loginform">username:</span>
             <Input v-model="username" placeholder="username" style="width: 400px" />
         </div>
 
-        <div class="modalInputLabel">
-            <span class="modalInputLabel">password:</span>
+        <div class="loginform">
+            <span class="loginform">password:</span>
             <Input type="password" v-model="password" placeholder="password" style="width: 400px" />
         </div>
 
@@ -80,11 +80,11 @@ export default {
     margin: 10px 0px;
 }
 
-div.modalInputLabel {
+div.loginform {
     margin: 15px 5px;
 }
 
-span.modalInputLabel {
+span.loginform {
     margin-right: 15px;
 }
 </style>
