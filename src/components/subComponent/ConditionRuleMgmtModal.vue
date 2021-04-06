@@ -1,5 +1,17 @@
 <template>
   <div>
+
+    <Modal
+      width="500px"
+      :mask-closable="false"
+      v-model="deleteCondirmModal.show"
+      title="清空该mock规则下所有条件规则!？"
+      @on-ok="          deleteConditionRulesByMockId(deleteCondirmModal.id
+          )"
+      @on-cancel=""
+    >
+    </Modal>
+
     <!-- 不要直接修改parent 传入的props值，这里为了方便，先这么使用，后续需要优化。  conditionRules.show -->
     <Modal
       width="800px"
@@ -7,42 +19,54 @@
       v-model="conditionRules.show"
       title="条件规则管理"
     >
+    <span style="color:orange;">备注： 如果未命中任何条件规则，则返回mock规则的默认返回值。若命中条件规则，则返回该条件规则的mock定义。</span>
       <div class="modalElementGroup">
         Mock规则Id:【{{
           conditionRules.params == undefined
             ? ""
             : conditionRules.params.row.id
-        }}】
-       请求Host:
-【{{
-            conditionRules.params == undefined
-              ? ""
-              : conditionRules.params.row.host
-          }}】
-        请求Uri:
-        【{{
-            conditionRules.params == undefined
-              ? ""
-              : conditionRules.params.row.uri
-          }}】
-
-        下的条件规则列表：
+        }}】 请求Host: 【{{
+          conditionRules.params == undefined
+            ? ""
+            : conditionRules.params.row.host
+        }}】 请求Uri: 【{{
+          conditionRules.params == undefined
+            ? ""
+            : conditionRules.params.row.uri
+        }}】 下的条件规则列表：
       </div>
 
-      <Button class="modalElementGroup" type="info" @click="queryConditionRulesByMockId(conditionRules.params == undefined
-            ? ''
-            : conditionRules.params.row.id)"
+      <Button
+        class="modalElementGroup"
+        type="info"
+        @click="
+          queryConditionRulesByMockId(
+            conditionRules.params == undefined
+              ? ''
+              : conditionRules.params.row.id
+          )
+        "
         >查询</Button
       >
 
-      <Button class="modalElementGroup" type="info" @click="showAddConditionRuleModal = true"
+      <Button
+        class="modalElementGroup"
+        type="info"
+        @click="showAddConditionRuleModal = true"
         >添加</Button
       >
 
-      <Button class="modalElementGroup" type="info" @click="deleteConditionRulesByMockId(conditionRules.params == undefined
-            ? ''
-            : conditionRules.params.row.id)"
-        >清空</Button>
+      <Button
+        class="modalElementGroup"
+        type="error"
+        @click="
+deleteCondirmModal.show = true;
+deleteCondirmModal.id = conditionRules.params == undefined
+              ? ''
+              : conditionRules.params.row.id ;
+        "
+        >清空</Button
+      >
 
       <Table
         border
@@ -77,7 +101,8 @@
     >
       <div class="modalElementGroup">
         <span class="modalInputLabel">条件组合:</span>
-        <div class="modalElementGroup"
+        <div
+          class="modalElementGroup"
           v-for="(
             expression, index
           ) in tobeAddedConditionRule.conditionExpression"
@@ -88,28 +113,24 @@
             v-model="expression.toBeCompareValue"
             style="width: 255px"
           />
-                  <Select
-          v-model="expression.compareCondition"
-          style="width: 145px"
-        >
-          <Option
-            v-for="item in conditionExpression"
-            :value="item.value"
-            :key="item.value"
-            >{{ item.label }}</Option
-          >
-        </Select>
-          
+          <Select v-model="expression.compareCondition"  style="width: 145px">
+            <Option
+              v-for="item in conditionExpression"
+              :value="item.value"
+              :key="item.value"
+              >{{ item.label }}</Option
+            >
+          </Select>
+
           <Input
             v-if="!isSpecialConditionExpression(expression.compareCondition)"
             v-model="expression.conditionValue"
             style="width: 255px"
           />
 
-              <Button type="info" @click="addOrDeleteCondition(index)"
-        >{{index == 0 ?'+':'-'}}</Button
-      >
-
+          <Button type="info" @click="addOrDeleteCondition(index)">{{
+            index == 0 ? "+" : "-"
+          }}</Button>
         </div>
       </div>
 
@@ -129,7 +150,10 @@
         </Select>
       </div>
 
-      <div class="modalElementGroup" v-if="tobeAddedConditionRule.workMode != 'MOCK'">
+      <div
+        class="modalElementGroup"
+        v-if="tobeAddedConditionRule.workMode != 'MOCK'"
+      >
         <div class="nextedForm">
           <span class="modalInputLabel">上游服务: </span>
 
@@ -152,7 +176,10 @@
         </div>
       </div>
 
-      <div class="modalElementGroup" v-if="tobeAddedConditionRule.workMode == 'MOCK'">
+      <div
+        class="modalElementGroup"
+        v-if="tobeAddedConditionRule.workMode == 'MOCK'"
+      >
         <span class="modalInputLabel">响应Headers:</span>
         <Input
           v-model="tobeAddedConditionRule.responseHeaders"
@@ -160,9 +187,12 @@
           :rows="5"
           placeholder="{'header':'value'}"
         />
-        </div>
+      </div>
 
-              <div class="modalElementGroup" v-if="tobeAddedConditionRule.workMode == 'MOCK'">
+      <div
+        class="modalElementGroup"
+        v-if="tobeAddedConditionRule.workMode == 'MOCK'"
+      >
         <span class="modalInputLabel">响应Mock报文:</span>
         <Input
           v-model="tobeAddedConditionRule.mockResponse"
@@ -170,8 +200,7 @@
           :rows="10"
           placeholder="mock response body"
         />
-              </div>
-
+      </div>
     </Modal>
 
     <!-- end of the add condition rule modal -->
@@ -191,6 +220,9 @@ export default {
   },
   data() {
     return {
+      deleteCondirmModal:{
+        show:false,
+        deleteId:''},
       mockRulesTotalSize: 0,
       pageNumber: 1,
       workModeOption: [
@@ -214,7 +246,7 @@ export default {
         },
         {
           value: "REGREX_MATCH",
-          label: "REGREX_MATCH",
+          label: "正则匹配",
         },
         {
           value: "GREATER_THAN",
@@ -254,22 +286,23 @@ export default {
         {
           title: "序号",
           key: "orderId",
-          width:60
+          width: 60,
         },
 
         {
           title: "条件",
           key: "conditionExpression",
+          render:this.renderConditionExpression,
         },
         {
           title: "模式",
           key: "workMode",
-          width:80
+          width: 80,
         },
         {
           title: "自定义响应头",
           key: "responseHeaders",
-          render:this.renderResponseHeader
+         // render: this.renderResponseHeader,
         },
 
         {
@@ -277,9 +310,9 @@ export default {
           key: "mockResponse",
         },
         {
-          title:'操作',
-          render:this.renderActionColumn
-        }
+          title: "操作",
+          render: this.renderActionColumn,
+        },
       ],
       conditionRuleListData: [],
       server: this.$store.getters.getServer,
@@ -291,7 +324,7 @@ export default {
         conditionExpression: [
           {
             toBeCompareValue: "",
-            compareCondition: "",
+            compareCondition: "EQUAL",
             conditionValue: "",
           },
         ],
@@ -330,30 +363,80 @@ export default {
     },
   },
   methods: {
-    renderResponseHeader:function(h,params){
-        
+    renderConditionExpression:function(h,params){
+      let showtext = '';
+      this.$log.debug(params.row.conditionExpression.keys());
+      this.$log.debug(typeof(params.row.conditionExpression));
+      let thiz = this;
+      params.row.conditionExpression.forEach(
+          function(element){
+            thiz.$log.debug('-------------');
+            thiz.$log.debug(element);
+            if(thiz.isSpecialConditionExpression(element.compareCondition))
+            {
+            showtext =  showtext+thiz.getConditionExpressLabel(element.compareCondition)+' ';
+
+            }
+            else{
+            showtext =  showtext+element.toBeCompareValue+' '+thiz.getConditionExpressLabel(element.compareCondition)+' '+element.conditionValue+' ';
+            }
+          }
+
+      );
+
+      return h('div',{},showtext);
+    },
+
+    getConditionExpressLabel:function(expression){
+
+      let label = '==';
+      switch(expression){
+        case 'EQUAL': 
+          label = '==';         
+          break;
+        case 'NON_EQUAL': 
+          label = '!=';         
+          break;
+        case 'REGREX_MATCH': 
+          label = 'regrex_match';         
+          break;
+        case 'GREATER_THAN': 
+          label = '>';         
+          break;
+        case 'GREATER_OR_EQUAL': 
+          label = '>=';         
+          break;
+        case 'LESS_THAN': 
+          label = '<';         
+          break;
+        case 'LESS_OR_EQUAL': 
+          label = '<=';         
+          break;
+        case 'LEFT_PARENTHESIS': 
+          label = '(';         
+          break;
+        case 'RIGHT_PARENTHESIS': 
+          label = ')';         
+          break;
+        case 'OR': 
+          label = '||';         
+          break;
+        case 'AND': 
+          label = '&&';         
+          break;                                                                                                                                              
+        default :
+
+      }
+
+      return label;
+
+    },
+
+    renderResponseHeader: function (h, params) {
+
     },
     renderActionColumn: function (h, params) {
       return h("div", [
-        h(
-          "Button",
-          {
-            props: {
-              type: "primary",
-              size: "small",
-            },
-            style: {
-              margin: "5px",
-            },
-            on: {
-              click: () => {
-                this.updateConditionRule(params);
-              },
-            },
-          },
-          "修改"
-        ),
-
         h(
           "Button",
           {
@@ -375,29 +458,53 @@ export default {
       ]);
     },
 
+    deleteConditionRule: async function (params) {
+      // delete specified condition rule
+      this.$log.debug(this.httpConditionRuleDetails);
+      this.$log.debug(params);
+      let conditionRuleId = this.httpConditionRuleDetails.id;
+      let uri =
+        this.server +
+        "/xxxxhissummerxxxx/api/httpConditionRule/" +
+        conditionRuleId +
+        "/" +
+        (params.row.orderId - 1);
+      this.$log.debug(uri);
+      let postresult = await this.newaxios.delete(uri);
+      this.$log.debug(
+        "delete specified condition to condition rules : ",
+        postresult
+      );
+      if (postresult.data.success) {
+        this.conditionRuleListData = postresult.data.data.conditionRules;
+        this.httpConditionRuleDetails = postresult.data.data;
+      } else if (postresult.status != 200 || !postresult.data.success) {
+        this.error(
+          "delete spcefied conditionRule error: ",
+          postresult.data.message
+        );
+      }
+    },
     changeWorkMode: function () {},
     isSpecialConditionExpression: function (expression) {
-
-      return (
+      let isSpecial = (
         expression == "LEFT_PARENTHESIS" ||
         expression == "RIGHT_PARENTHESIS" ||
         expression == "OR" ||
         expression == "AND"
       );
+      return isSpecial;
     },
-    addOrDeleteCondition:function(index){
-      if(index == 0)
-      {
-      this.tobeAddedConditionRule.conditionExpression.push({
-            toBeCompareValue: "",
-            compareCondition: "",
-            conditionValue: "",
-          });
+    addOrDeleteCondition: function (index) {
+      if (index == 0) {
+        this.tobeAddedConditionRule.conditionExpression.push({
+          toBeCompareValue: "",
+          compareCondition: "",
+          conditionValue: "",
+        });
+      } else {
+        this.tobeAddedConditionRule.conditionExpression.splice(index, 1);
       }
-      else{
-        this.tobeAddedConditionRule.conditionExpression.splice(index,1);
-      }
-
     },
     addOk: async function () {
       this.httpConditionRuleDetails.httpMockRuleId = this.conditionRules.params.row.id;
@@ -410,34 +517,61 @@ export default {
       } catch (e) {
         this.tobeAddedConditionRule.responseHeaders = {};
       }
-      this.httpConditionRuleDetails.conditionRules.push(this.tobeAddedConditionRule);
+      this.httpConditionRuleDetails.conditionRules.push(
+        this.tobeAddedConditionRule
+      );
       this.$log.debug(this.httpConditionRuleDetails);
 
       if (
         this.httpConditionRuleDetails.id == null ||
-        this.httpConditionRuleDetails.id == undefined ||
-        this.httpConditionRuleDetails.id == null
+        this.httpConditionRuleDetails.id == undefined
       ) {
         await this.addNewHttpConditionRule(this.httpConditionRuleDetails);
       } else {
         await this.updateHttpConditionRule(this.httpConditionRuleDetails);
       }
-
-      this.queryConditionRulesByMockId(this.httpConditionRuleDetails.httpMockRuleId);
+      this.clearAddConditionFormData();
+      this.queryConditionRulesByMockId(
+        this.httpConditionRuleDetails.httpMockRuleId
+      );
+    },
+    clearAddConditionFormData() {
+      this.tobeAddedConditionRule.responseHeaders = "";
+      this.tobeAddedConditionRule.mockResponse = "";
+      this.tobeAddedConditionRule.conditionExpression = [
+        {
+          toBeCompareValue: "",
+          compareCondition: "",
+          conditionValue: "",
+        },
+      ];
+      this.tobeAddedConditionRule.upstreams = {
+        nodes: [
+          {
+            protocol: "http",
+            address: "",
+            uri: "",
+            upstreamPolicy: null,
+          },
+        ],
+      };
+      this.tobeAddedConditionRule.workMode = "MOCK";
     },
     addCancel: async function () {},
     changePageNumber: async function () {},
     changePageSize: async function () {},
-    updateHttpConditionRule:async function(rule){
-
-      let uri = this.server + "/xxxxhissummerxxxx/api/httpConditionRule/mockRuleId-" +
+    updateHttpConditionRule: async function (rule) {
+      //update all http condition rules.
+      let uri =
+        this.server +
+        "/xxxxhissummerxxxx/api/httpConditionRule/mockRuleId-" +
         rule.httpMockRuleId;
       this.$log.debug(this.newaxios);
       let postresult = await this.newaxios.post(uri, rule);
       this.$log.debug("add new condition to condition rules : ", postresult);
       if (postresult.data.success) {
-        this.conditionRuleListData = postresult.data.data.conditionRules;
-        this.httpConditionRule = postresult.data.data;
+        //this.conditionRuleListData = postresult.data.data.conditionRules;
+        //this.httpConditionRuleDetails = postresult.data.data;
       } else if (postresult.status != 200 || !postresult.data.success) {
         this.error("add conditionRules error: ", postresult.data.message);
       }
@@ -449,13 +583,13 @@ export default {
       this.$log.debug("add new rules : ", postresult);
       if (postresult.data.success) {
         this.conditionRuleListData = postresult.data.data.conditionRules;
-        this.httpConditionRuleD = postresult.data.data;
+        this.httpConditionRuleDetails = postresult.data.data;
       } else if (postresult.status != 200 || !postresult.data.success) {
         this.error("add conditionRules error: ", postresult.data.message);
       }
     },
 
-deleteConditionRulesByMockId:async function(mockRuleId){
+    deleteConditionRulesByMockId: async function (mockRuleId) {
       if (mockRuleId == "")
         this.error("mock rule id can not be empty! ", postresult.data.message);
 
@@ -464,17 +598,19 @@ deleteConditionRulesByMockId:async function(mockRuleId){
         "/xxxxhissummerxxxx/api/httpConditionRule/mockRuleId-" +
         mockRuleId;
       this.$log.debug(this.newaxios);
-      let postresult = await this.newaxios.delete(uri,this.httpConditionRuleDetails);
+      let postresult = await this.newaxios.delete(
+        uri,
+        this.httpConditionRuleDetails
+      );
       this.$log.debug("delete conditionrules by mockid : ", postresult);
       if (postresult.data.success) {
-          this.queryConditionRulesByMockId(mockRuleId);
+        this.queryConditionRulesByMockId(mockRuleId);
       } else if (postresult.status != 200 || !postresult.data.success) {
         this.conditionRuleListData = [];
         this.httpConditionRuleDetails.conditionRules = [];
         this.error("delete conditionRules ", postresult.data.message);
       }
-
-},
+    },
 
     queryConditionRulesByMockId: async function (mockRuleId) {
       if (mockRuleId == "")
@@ -490,13 +626,11 @@ deleteConditionRulesByMockId:async function(mockRuleId){
       if (postresult.data.data != null) {
         this.conditionRuleListData = postresult.data.data.conditionRules;
         this.httpConditionRuleDetails = postresult.data.data;
-      } 
-       else if (postresult.data.data == null) {
+      } else if (postresult.data.data == null) {
         this.conditionRuleListData = [];
         this.httpConditionRuleDetails.conditionRules = [];
         this.httpConditionRuleDetails.id = null;
-      }
-      else if (postresult.status != 200 || !postresult.data.success) {
+      } else if (postresult.status != 200 || !postresult.data.success) {
         this.conditionRuleListData = [];
         this.httpConditionRuleDetails.conditionRules = [];
         this.error("query conditionRules ", postresult.data.message);
@@ -514,14 +648,12 @@ deleteConditionRulesByMockId:async function(mockRuleId){
         desc: nodesc,
       });
     },
-  
   },
 };
 </script>
 
 <style scoped>
-.modalElementGroup{
-  margin:5px;
-
+.modalElementGroup {
+  margin: 5px;
 }
 </style>

@@ -772,7 +772,7 @@ export default {
                     },
                   },
                 },
-                "编辑条件规则"
+                "条件规则"
               ),         
         h(
           "Button",
@@ -1013,6 +1013,8 @@ export default {
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
 
       let postBody = lodash.cloneDeep(this.addRule);
+
+      this.$log.debug(postBody);
 
       postBody.responseHeaders = JSON.parse(postBody.responseHeaders);
 
