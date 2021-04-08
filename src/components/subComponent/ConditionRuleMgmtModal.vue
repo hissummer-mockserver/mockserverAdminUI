@@ -14,7 +14,7 @@
 
     <!-- 不要直接修改parent 传入的props值，这里为了方便，先这么使用，后续需要优化。  conditionRules.show -->
     <Modal
-      width="800px"
+      width="1024px"
       :mask-closable="false"
       v-model="conditionRules.show"
       title="条件规则管理"
@@ -60,8 +60,8 @@
         class="modalElementGroup"
         type="error"
         @click="
-deleteCondirmModal.show = true;
-deleteCondirmModal.id = conditionRules.params == undefined
+            deleteCondirmModal.show = true;
+            deleteCondirmModal.id = conditionRules.params == undefined
               ? ''
               : conditionRules.params.row.id ;
         "
@@ -95,7 +95,7 @@ deleteCondirmModal.id = conditionRules.params == undefined
       width="750px"
       :mask-closable="false"
       v-model="showAddConditionRuleModal"
-      title="添加条件规则"
+      title="添加或更新条件规则"
       @on-ok="addOk"
       @on-cancel="addCancel"
     >
@@ -300,18 +300,19 @@ export default {
           width: 80,
         },
         {
-          title: "自定义响应头",
+          title: "Mock响应头(Upstream下无效)",
           key: "responseHeaders",
          // render: this.renderResponseHeader,
         },
 
         {
-          title: "响应体",
-          key: "mockResponse",
+          title: "Mock响应体或Upstream节点",
+          render: this.renderMockResponseColumn
         },
         {
           title: "操作",
           render: this.renderActionColumn,
+          width:140
         },
       ],
       conditionRuleListData: [],
@@ -330,7 +331,7 @@ export default {
         ],
         orderId: null,
         mockResponse: "",
-        responseHeaders: "",
+        responseHeaders: null,
         upstreams: {
           nodes: [
             {
@@ -363,6 +364,34 @@ export default {
     },
   },
   methods: {
+
+    renderMockResponseColumn: function (h, params) {
+
+      let mockResponse = '';
+      if (params.row.workMode == "MOCK") {
+        mockResponse =
+          params.row.mockResponse == null ? "无" : params.row.mockResponse;
+        return h(
+          "Tooltip",
+          {
+            props: {
+              transfer: true,
+              theme: "light",
+              placement: "left-start",
+              "max-width": "500",
+              content: mockResponse,
+            },
+          },
+          [h("div", this.showless(mockResponse))]
+        );
+      } else {
+        let showUpstreamText = '';
+        let node = params.row.upstreams.nodes[0];
+        showUpstreamText+= node.protocol+'://'+node.address+node.uri+'\r\n';
+        return h("div", showUpstreamText);
+      }
+    },
+
     renderConditionExpression:function(h,params){
       let showtext = '';
       this.$log.debug(params.row.conditionExpression.keys());
@@ -370,8 +399,7 @@ export default {
       let thiz = this;
       params.row.conditionExpression.forEach(
           function(element){
-            thiz.$log.debug('-------------');
-            thiz.$log.debug(element);
+
             if(thiz.isSpecialConditionExpression(element.compareCondition))
             {
             showtext =  showtext+thiz.getConditionExpressLabel(element.compareCondition)+' ';
@@ -441,6 +469,24 @@ export default {
           "Button",
           {
             props: {
+              type: "info",
+              size: "small",
+            },
+            style: {
+              margin: "5px",
+            },
+            on: {
+              click: () => {
+                this.showUpdateConditionRuleModal(params);
+              },
+            },
+          },
+          "编辑"
+        ),        
+        h(
+          "Button",
+          {
+            props: {
               type: "error",
               size: "small",
             },
@@ -457,7 +503,12 @@ export default {
         ),
       ]);
     },
+  showUpdateConditionRuleModal:function(params){
 
+    this.showAddConditionRuleModal = true;
+    this.tobeAddedConditionRule = params.row;
+
+  },
     deleteConditionRule: async function (params) {
       // delete specified condition rule
       this.$log.debug(this.httpConditionRuleDetails);
@@ -508,6 +559,16 @@ export default {
     },
     addOk: async function () {
       this.httpConditionRuleDetails.httpMockRuleId = this.conditionRules.params.row.id;
+      let isAddfirstCondition = true; // 是否是第一次添加条件规则
+      if (
+        this.httpConditionRuleDetails.id != null &&
+        this.httpConditionRuleDetails.id != undefined  && this.tobeAddedConditionRule.orderId  != null
+      )      
+      {
+          // todo !
+          isAddfirstCondition = false;
+      }
+
       this.tobeAddedConditionRule.orderId =
         this.httpConditionRuleDetails.conditionRules.length + 1;
       try {
@@ -515,7 +576,7 @@ export default {
           this.tobeAddedConditionRule.responseHeaders
         );
       } catch (e) {
-        this.tobeAddedConditionRule.responseHeaders = {};
+        this.tobeAddedConditionRule.responseHeaders = null;
       }
       this.httpConditionRuleDetails.conditionRules.push(
         this.tobeAddedConditionRule
@@ -523,12 +584,14 @@ export default {
       this.$log.debug(this.httpConditionRuleDetails);
 
       if (
-        this.httpConditionRuleDetails.id == null ||
-        this.httpConditionRuleDetails.id == undefined
+        isAddfirstCondition
       ) {
-        await this.addNewHttpConditionRule(this.httpConditionRuleDetails);
+        //第一次添加条件规则(第一次添加条件规则，因为已经存在条件规则，只是条件规则列表为空)
+        await this.addFirstNewHttpConditionRule(this.httpConditionRuleDetails);
+
       } else {
-        await this.updateHttpConditionRule(this.httpConditionRuleDetails);
+        //添加条件规则,  todo!!!!!!!
+        await this.addHttpConditionRule(this.httpConditionRuleDetails);
       }
       this.clearAddConditionFormData();
       this.queryConditionRulesByMockId(
@@ -576,7 +639,7 @@ export default {
         this.error("add conditionRules error: ", postresult.data.message);
       }
     },
-    addNewHttpConditionRule: async function (rule) {
+    addFirstNewHttpConditionRule: async function (rule) {
       let uri = this.server + "/xxxxhissummerxxxx/api/httpConditionRule";
       this.$log.debug(this.newaxios);
       let postresult = await this.newaxios.put(uri, rule);
@@ -588,7 +651,18 @@ export default {
         this.error("add conditionRules error: ", postresult.data.message);
       }
     },
-
+    addHttpConditionRule: async function (rule) {
+      let uri = this.server + "/xxxxhissummerxxxx/api/httpConditionRule";
+      this.$log.debug(this.newaxios);
+      let postresult = await this.newaxios.put(uri, rule);
+      this.$log.debug("add new rules : ", postresult);
+      if (postresult.data.success) {
+        this.conditionRuleListData = postresult.data.data.conditionRules;
+        this.httpConditionRuleDetails = postresult.data.data;
+      } else if (postresult.status != 200 || !postresult.data.success) {
+        this.error("add conditionRules error: ", postresult.data.message);
+      }
+    },
     deleteConditionRulesByMockId: async function (mockRuleId) {
       if (mockRuleId == "")
         this.error("mock rule id can not be empty! ", postresult.data.message);

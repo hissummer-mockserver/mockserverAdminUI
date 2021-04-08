@@ -540,12 +540,12 @@ export default {
           width: 100,
         },
         {
-          title: "hostName",
+          title: "HostName",
           key: "host",
           width: 200,
         },
         {
-          title: "uri",
+          title: "Uri",
           key: "uri",
           width: 250,
         },
@@ -555,14 +555,14 @@ export default {
           key: "workMode",
         },
         {
-          title: "默认上游节点",
-          render: this.renderUpstreamNodes,
-          width: 180,
-        },
+          title: "Mock响应头(Upstream模式下无效)",
+          key: "responseHeaders",
+          width:250,
+        },        
         {
-          title: "默认响应mock报文",
-          key: "mockResponse",
-          render: this.renderMockResponseColumn,
+          title: 'Mock报文或Upstream节点',
+          key:'responseOrUpstream',
+          render:this.renderMockResponseColumn
         },
         {
           title: "操作",
@@ -691,7 +691,11 @@ export default {
           [h("div", this.showless(mockResponse))]
         );
       } else {
-        return h("div", mockResponse);
+
+        let showUpstreamText = '';
+        let node = params.row.upstreams.nodes[0];
+        showUpstreamText+= node.protocol+'://'+node.address+node.uri+'\r\n';
+        return h("div", showUpstreamText);
       }
     },
     renderRequestLogRequestHeaders: function (h, params) {
