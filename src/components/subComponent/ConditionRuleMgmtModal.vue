@@ -52,7 +52,7 @@
       <Button
         class="modalElementGroup"
         type="info"
-        @click="showAddConditionRuleModal = true"
+        @click="openConditionModal()"
         >添加</Button
       >
 
@@ -364,7 +364,10 @@ export default {
     },
   },
   methods: {
-
+    openConditionModal:function(){
+          this.showAddConditionRuleModal = true; 
+          this.clearAddConditionFormData();
+    },
     renderMockResponseColumn: function (h, params) {
 
       let mockResponse = '';
@@ -391,7 +394,16 @@ export default {
         return h("div", showUpstreamText);
       }
     },
+    showless: function (message) {
+      let showlessMessage =
+        typeof message === "string" || message instanceof String
+          ? message
+          : JSON.stringify(message);
 
+      return showlessMessage.length > 128
+        ? showlessMessage.substring(0, 128) + " ...更多内容"
+        : showlessMessage;
+    },
     renderConditionExpression:function(h,params){
       let showtext = '';
       this.$log.debug(params.row.conditionExpression.keys());
@@ -558,19 +570,23 @@ export default {
       }
     },
     addOk: async function () {
+      this.showAddConditionRuleModal = false;
       this.httpConditionRuleDetails.httpMockRuleId = this.conditionRules.params.row.id;
-      let isAddfirstCondition = true; // 是否是第一次添加条件规则
+      let isAddCondition = true; // 是否是添加条件规则
       if (
-        this.httpConditionRuleDetails.id != null &&
-        this.httpConditionRuleDetails.id != undefined  && this.tobeAddedConditionRule.orderId  != null
+        this.tobeAddedConditionRule.orderId  != null
       )      
       {
-          // todo !
-          isAddfirstCondition = false;
+          // this.tobeAddedConditionRule.orderId  规则Id不存在，证明是要添加。
+          isAddCondition = false;
       }
-
-      this.tobeAddedConditionRule.orderId =
+      if(this.tobeAddedConditionRule.orderId ==null )
+       {  this.tobeAddedConditionRule.orderId =
         this.httpConditionRuleDetails.conditionRules.length + 1;
+      this.httpConditionRuleDetails.conditionRules.push(
+        this.tobeAddedConditionRule
+      );
+       }
       try {
         this.tobeAddedConditionRule.responseHeaders = JSON.parse(
           this.tobeAddedConditionRule.responseHeaders
@@ -578,27 +594,31 @@ export default {
       } catch (e) {
         this.tobeAddedConditionRule.responseHeaders = null;
       }
-      this.httpConditionRuleDetails.conditionRules.push(
-        this.tobeAddedConditionRule
-      );
+
       this.$log.debug(this.httpConditionRuleDetails);
 
       if (
-        isAddfirstCondition
+        isAddCondition
       ) {
-        //第一次添加条件规则(第一次添加条件规则，因为已经存在条件规则，只是条件规则列表为空)
-        await this.addFirstNewHttpConditionRule(this.httpConditionRuleDetails);
+        //添加规则，直接调用添加。 
+        if(this.httpConditionRuleDetails.id != null && this.httpConditionRuleDetails.id != undefined)
+        {
+          await this.addNewHttpConditionRule(this.httpConditionRuleDetails.httpMockRuleId,this.httpConditionRuleDetails);
+        }
+        else{
+          await this.addFirstNewHttpConditionRule(this.httpConditionRuleDetails);
+        }
 
       } else {
-        //添加条件规则,  todo!!!!!!!
-        await this.addHttpConditionRule(this.httpConditionRuleDetails);
+        //编辑规则,  todo!!!!!!!
+        await this.updateHttpConditionRule(this.httpConditionRuleDetails.id, this.tobeAddedConditionRule.orderId, this.tobeAddedConditionRule);
       }
-      this.clearAddConditionFormData();
       this.queryConditionRulesByMockId(
         this.httpConditionRuleDetails.httpMockRuleId
       );
     },
     clearAddConditionFormData() {
+      this.tobeAddedConditionRule.orderId = null;
       this.tobeAddedConditionRule.responseHeaders = "";
       this.tobeAddedConditionRule.mockResponse = "";
       this.tobeAddedConditionRule.conditionExpression = [
@@ -623,22 +643,6 @@ export default {
     addCancel: async function () {},
     changePageNumber: async function () {},
     changePageSize: async function () {},
-    updateHttpConditionRule: async function (rule) {
-      //update all http condition rules.
-      let uri =
-        this.server +
-        "/xxxxhissummerxxxx/api/httpConditionRule/mockRuleId-" +
-        rule.httpMockRuleId;
-      this.$log.debug(this.newaxios);
-      let postresult = await this.newaxios.post(uri, rule);
-      this.$log.debug("add new condition to condition rules : ", postresult);
-      if (postresult.data.success) {
-        //this.conditionRuleListData = postresult.data.data.conditionRules;
-        //this.httpConditionRuleDetails = postresult.data.data;
-      } else if (postresult.status != 200 || !postresult.data.success) {
-        this.error("add conditionRules error: ", postresult.data.message);
-      }
-    },
     addFirstNewHttpConditionRule: async function (rule) {
       let uri = this.server + "/xxxxhissummerxxxx/api/httpConditionRule";
       this.$log.debug(this.newaxios);
@@ -651,11 +655,22 @@ export default {
         this.error("add conditionRules error: ", postresult.data.message);
       }
     },
-    addHttpConditionRule: async function (rule) {
-      let uri = this.server + "/xxxxhissummerxxxx/api/httpConditionRule";
+    addNewHttpConditionRule: async function (mockruleId,rule) {
+      let uri = this.server + "/xxxxhissummerxxxx/api/httpConditionRule/mockRuleId-"+mockruleId;
       this.$log.debug(this.newaxios);
-      let postresult = await this.newaxios.put(uri, rule);
+      let postresult = await this.newaxios.post(uri, rule);
       this.$log.debug("add new rules : ", postresult);
+      if (postresult.data.success) {
+        this.conditionRuleListData = postresult.data.data.conditionRules;
+        this.httpConditionRuleDetails = postresult.data.data;
+      } else if (postresult.status != 200 || !postresult.data.success) {
+        this.error("add conditionRules error: ", postresult.data.message);
+      }
+    },    
+    updateHttpConditionRule: async function (conditionRuleId, conditionId,condition) {
+      let uri = this.server + "/xxxxhissummerxxxx/api/httpConditionRule/"+conditionRuleId+'/'+conditionId;
+      this.$log.debug(this.newaxios);
+      let postresult = await this.newaxios.post(uri, condition);
       if (postresult.data.success) {
         this.conditionRuleListData = postresult.data.data.conditionRules;
         this.httpConditionRuleDetails = postresult.data.data;
