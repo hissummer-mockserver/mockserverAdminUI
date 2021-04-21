@@ -838,21 +838,21 @@ export default {
     changeWorkMode: function (workMode) {
       if (workMode == "UPSTREAM") {
         this.showUpstreamMode = true;
-        this.responseBody = false;
-        this.responseHeaders = false;
+       // this.responseBody = false;    
+       // this.responseHeaders = false; 
       } else {
         this.showUpstreamMode = false;
-        this.addRule.upstreams = {
-          nodes: [
-            {
-              protocol: "",
-              address: "",
-              uri: "",
-            },
-          ],
-        };
-        this.responseBody = true;
-        this.responseHeaders = true;
+        // this.addRule.upstreams = {
+        //   nodes: [
+        //     {
+        //       protocol: "",
+        //       address: "",
+        //       uri: "",
+        //     },
+        //   ],
+        // };
+       // this.responseBody = true;
+       // this.responseHeaders = true;
       }
     },
 
@@ -955,12 +955,9 @@ export default {
       this.addRule.id = params.row.id;
       this.addRule.update = true;
       this.addRule.category = params.row.category;
-      if (params.row.workMode == "UPSTREAM") {
-        this.addRule.upstreams = params.row.upstreams;
-        this.addRule.workMode = "UPSTREAM";
-      } else {
-        this.addRule.workMode = "MOCK";
-      }
+      this.addRule.upstreams = params.row.upstreams;
+      this.addRule.workMode = params.row.workMode;
+
       this.addRule.responseHeaders =
         params.row.responseHeaders == null
           ? null
