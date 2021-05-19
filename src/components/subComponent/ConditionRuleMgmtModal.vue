@@ -155,7 +155,7 @@
         v-if="tobeAddedConditionRule.workMode != 'MOCK'"
       >
         <div class="nextedForm">
-          <span class="modalInputLabel">上游服务: </span>
+          <span class="modalInputLabel">上游服务: </span> <div style="color:orange;"> 【protocol://address/uri】 INTERNAL_FORWARD 内部转发模式下 protocol和address仍为首次请求的地址，仅uri的配置会用于内部转发。</div>
 
           <Input
             v-model="tobeAddedConditionRule.upstreams.nodes[0].protocol"
@@ -234,6 +234,10 @@ export default {
           value: "UPSTREAM",
           label: "Upstream",
         },
+        {
+          value: "INTERNAL_FORWARD",
+          label: "InternalForward",
+        },        
       ],
       conditionExpression: [
         {

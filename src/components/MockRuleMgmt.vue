@@ -207,7 +207,7 @@
       </div>
       <div v-if="showUpstreamMode">
         <div class="nextedForm">
-          <span class="modalInputLabel">上游服务: </span>
+          <span class="modalInputLabel">上游服务:   </span> <div style="color:orange;"> 【protocol://address/uri】 INTERNAL_FORWARD 内部转发模式下 protocol和address仍为首次请求的地址，仅uri的配置会用于内部转发。</div>
 
           <Input
             v-model="addRule.upstreams.nodes[0].protocol"
@@ -403,6 +403,10 @@ export default {
           value: "UPSTREAM",
           label: "Upstream",
         },
+        {
+          value: "INTERNAL_FORWARD",
+          label: "InternalForward",
+        },        
       ],
       showUpstreamMode: false,
       addRule: {
@@ -665,7 +669,7 @@ export default {
     },
     renderUpstreamNodes: function (h, params) {
       let upstreamNodes = "N/A";
-      if (params.row.workMode == "UPSTREAM") {
+      if (params.row.workMode == "UPSTREAM" || params.row.workMode == "INTERNAL_FORWARD") {
         upstreamNodes = params.row.upstreams.nodes;
       }
 
@@ -836,7 +840,7 @@ export default {
     },
 
     changeWorkMode: function (workMode) {
-      if (workMode == "UPSTREAM") {
+      if (workMode == "UPSTREAM" || workMode == 'INTERNAL_FORWARD') {
         this.showUpstreamMode = true;
        // this.responseBody = false;    
        // this.responseHeaders = false; 
@@ -971,7 +975,7 @@ export default {
     deleteMockRule: async function (params) {
       this.assignMockRuleData(params);
 
-      if (params.row.workMode == "UPSTREAM") {
+      if (params.row.workMode == "UPSTREAM" || params.row.workMode == 'INTERNAL_FORWARD') {
         this.showUpstreamMode = true;
       }
 
@@ -983,7 +987,7 @@ export default {
       this.modalTitle = "修改Mock规则";
       this.addRuleModal = true;
 
-      if (params.row.workMode == "UPSTREAM") {
+      if (params.row.workMode == "UPSTREAM"|| params.row.workMode == 'INTERNAL_FORWARD') {
         this.showUpstreamMode = true;
       } else {
         this.showUpstreamMode = false;
@@ -995,7 +999,7 @@ export default {
 
       this.modalTitle = "根据已有规则创建Mock规则";
 
-      if (params.row.workMode == "UPSTREAM") {
+      if (params.row.workMode == "UPSTREAM"|| params.row.workMode == 'INTERNAL_FORWARD') {
         this.showUpstreamMode = true;
       } else {
         this.showUpstreamMode = false;
