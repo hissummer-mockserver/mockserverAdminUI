@@ -24,22 +24,22 @@
         </div>
 
         <div>
-            <span class="modalInputLabel">ServiceName:</span>
+            <span class="modalInputLabel">要注册服务的名称(ServiceName):</span>
             <Input v-model="addRule.serviceName" placeholder="serviceName" style="width: 400px" />
         </div>
 
         <div>
-            <span class="modalInputLabel">Ip Address/Domain Name:</span>
+            <span class="modalInputLabel">要注册服务的地址(Ip Address/Domain Name):</span>
             <Input v-model="addRule.hostName" placeholder="要添加的HostName,不能为空" style="width: 400px" />
         </div>
 
         <div>
-            <span class="modalInputLabel">Port:</span>
+            <span class="modalInputLabel">要注册服务的端口(Port):</span>
             <Input v-model="addRule.port" placeholder="端口号" style="width: 400px" />
         </div>
 
         <div>
-            <span class="modalInputLabel">Eureka Server:</span>
+            <span class="modalInputLabel">注册中心地址(Eureka Server):</span>
             <Input v-model="addRule.eurekaServer" placeholder="eurekaServer" style="width: 400px" />
         </div>
     </Modal>
@@ -99,18 +99,19 @@ export default {
                 //   title: "eureka version",
                 //   key: "version"
                 // },
-                {
-                    title: "hostName",
-                    key: "hostName"
-                },
-                {
-                    title: "port",
-                    key: "port"
-                },
+
                 {
                     title: "serviceName",
                     key: "serviceName"
                 },
+                {
+                    title: "hostName of service",
+                    key: "hostName"
+                },
+                {
+                    title: "port of service",
+                    key: "port"
+                },                
                 {
                     title: 'Disable/Enable',
                     key: 'enable',
