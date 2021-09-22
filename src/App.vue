@@ -257,9 +257,8 @@ export default {
     padding-bottom: 78px;
 }
 .modalInputLabel {
-  width: 110px;
+    width:200px;
   padding: 10px;
-  display: inline-block;
   font-weight:700;
 }
 </style>

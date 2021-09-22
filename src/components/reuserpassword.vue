@@ -97,6 +97,13 @@ export default {
 </script>
 
 <style scoped>
+
+.repassword{
+    margin-left: auto;
+    margin-right: auto;
+    width: 20%;
+}
+
 .button {
     margin: 10px 0px;
 }
