@@ -517,16 +517,6 @@ export default {
         },
       ],
       columns: [
-        /*
-                {
-                  title: "id",
-                  key: "id",
-                  width:120
-                  // render: (h, params) => {
-                  //   return h("div", params.row._id.$oid)
-                  // }
-                },
-                */
         {
           title: "分组",
           key: "category",
@@ -560,6 +550,7 @@ export default {
         {
           title: "响应mock报文",
           key: "mockResponse",
+          minWidth:200,
           render: this.renderMockResponseColumn,
         },
         {

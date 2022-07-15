@@ -233,6 +233,10 @@ export default {
             this.pageNumber = number;
             this.queryMockRules();
         },
+        queryMockRulesByButton:function(){
+            this.pageNumber = 1;
+            this.queryMockRules();
+        },
         queryMockRules: async function () {
             let uri = this.server + "/xxxxhissummerxxxx/api/queryEurekaRule" + '';
 
