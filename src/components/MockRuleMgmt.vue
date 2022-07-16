@@ -207,7 +207,7 @@
       </div>
       <div v-if="showUpstreamMode">
         <div class="nextedForm">
-          <span class="modalInputLabel">上游服务: </span>
+          <span class="modalInputLabel">上游服务:   </span> <div style="color:orange;"> 【protocol://address/uri】 INTERNAL_FORWARD 内部转发模式下 protocol和address仍为首次请求的地址，仅uri的配置会用于内部转发。</div>
 
           <Input
             v-model="addRule.upstreams.nodes[0].protocol"
@@ -233,7 +233,7 @@
           v-model="addRule.responseHeaders"
           type="textarea"
           :rows="5"
-          placeholder="{'header1':'value1'}"
+          placeholder="{'header':'value'}"
         />
       </div>
 
@@ -339,8 +339,10 @@
         />
       </div>
     </Modal>
-
     <!-- end of the delete modal -->
+
+<conditionRuleMgmtModal  v-bind:condition-rules="conditionRules"></conditionRuleMgmtModal>
+
   </div>
 </template>
 
@@ -348,6 +350,9 @@
 //var _ = require('lodash')
 
 import lodash from "lodash";
+import Vue from "vue";
+import conditionRuleMgmtModal from "./subComponent/ConditionRuleMgmtModal.vue";
+Vue.component("conditionRuleMgmtModal", conditionRuleMgmtModal);
 
 export default {
   created: function () {
@@ -356,6 +361,8 @@ export default {
   },
   data() {
     return {
+      conditionRules:{show:false},
+      ifShowConditionalRuleMgmtModal:false, //是否展示条件规则管理弹窗标志位
       isAddCategory:true,
       toBeAddCategory:{
         category:null,
@@ -396,6 +403,10 @@ export default {
           value: "UPSTREAM",
           label: "Upstream",
         },
+        {
+          value: "INTERNAL_FORWARD",
+          label: "InternalForward",
+        },        
       ],
       showUpstreamMode: false,
       addRule: {
@@ -429,7 +440,7 @@ export default {
           key: "action",
           align: "center",
           render:(h, params) => {
-          return  h("div", [
+          return  h("div", [     
              h(
                 "Button",
                 {
@@ -447,7 +458,7 @@ export default {
                   },
                 },
                 "修改"
-              ),
+              ),      
               h(
                 "Button",
                 {
@@ -523,40 +534,40 @@ export default {
           width: 100,
         },
         {
-          title: "hostName",
+          title: "HostName",
           key: "host",
           width: 200,
         },
         {
-          title: "uri",
+          title: "Uri",
           key: "uri",
           width: 250,
         },
         {
-          title: "工作模式",
-          width: 100,
+          title: "默认工作模式",
+          width: 120,
           key: "workMode",
         },
         {
-          title: "上游节点",
-          render: this.renderUpstreamNodes,
-          width: 180,
-        },
+          title: "Mock响应头(Upstream模式下无效)",
+          key: "responseHeaders",
+          width:250,
+        },        
         {
           title: "响应Headers",
           width: 150,
           render: this.renderMockResponseHeaders,
         },
         {
-          title: "响应mock报文",
-          key: "mockResponse",
           minWidth:200,
-          render: this.renderMockResponseColumn,
+          title: 'Mock报文或Upstream节点',
+          key:'responseOrUpstream',
+          render:this.renderMockResponseColumn
         },
         {
           title: "操作",
           key: "action",
-          width: 200,
+          width: 300,
           align: "center",
           render: this.renderActionColumn,
         },
@@ -568,6 +579,17 @@ export default {
     };
   },
   methods: {
+    /**
+     * 打开条件规则管理弹窗
+     */
+    showConditionalRuleMgmtModal:function(params){
+
+      this.conditionRules.params = params;
+      this.conditionRules.show = true;
+      this.$log.debug(this.conditionRules);
+      this.ifShowConditionalRuleMgmtModal = true;
+
+    },
     updateCategory:async function(){
       let uri = this.server + "/xxxxhissummerxxxx/api/updateCategory";
 
@@ -643,7 +665,7 @@ export default {
     },
     renderUpstreamNodes: function (h, params) {
       let upstreamNodes = "N/A";
-      if (params.row.workMode == "UPSTREAM") {
+      if (params.row.workMode == "UPSTREAM" || params.row.workMode == "INTERNAL_FORWARD") {
         upstreamNodes = params.row.upstreams.nodes;
       }
 
@@ -669,7 +691,11 @@ export default {
           [h("div", this.showless(mockResponse))]
         );
       } else {
-        return h("div", mockResponse);
+
+        let showUpstreamText = '';
+        let node = params.row.upstreams.nodes[0];
+        showUpstreamText+= node.protocol+'://'+node.address+node.uri+'\r\n';
+        return h("div", showUpstreamText);
       }
     },
     renderRequestLogRequestHeaders: function (h, params) {
@@ -734,6 +760,24 @@ export default {
           },
           "修改"
         ),
+             h(
+                "Button",
+                {
+                  props: {
+                    type: "primary",
+                    size: "small",
+                  },
+                  style: {
+                    margin: "5px",
+                  },
+                  on: {
+                    click: () => {
+                      this.showConditionalRuleMgmtModal(params);
+                    },
+                  },
+                },
+                "条件规则"
+              ),         
         h(
           "Button",
           {
@@ -792,23 +836,23 @@ export default {
     },
 
     changeWorkMode: function (workMode) {
-      if (workMode == "UPSTREAM") {
+      if (workMode == "UPSTREAM" || workMode == 'INTERNAL_FORWARD') {
         this.showUpstreamMode = true;
-        this.responseBody = false;
-        this.responseHeaders = false;
+       // this.responseBody = false;    
+       // this.responseHeaders = false; 
       } else {
         this.showUpstreamMode = false;
-        this.addRule.upstreams = {
-          nodes: [
-            {
-              protocol: "",
-              address: "",
-              uri: "",
-            },
-          ],
-        };
-        this.responseBody = true;
-        this.responseHeaders = true;
+        // this.addRule.upstreams = {
+        //   nodes: [
+        //     {
+        //       protocol: "",
+        //       address: "",
+        //       uri: "",
+        //     },
+        //   ],
+        // };
+       // this.responseBody = true;
+       // this.responseHeaders = true;
       }
     },
 
@@ -911,12 +955,9 @@ export default {
       this.addRule.id = params.row.id;
       this.addRule.update = true;
       this.addRule.category = params.row.category;
-      if (params.row.workMode == "UPSTREAM") {
-        this.addRule.upstreams = params.row.upstreams;
-        this.addRule.workMode = "UPSTREAM";
-      } else {
-        this.addRule.workMode = "MOCK";
-      }
+      this.addRule.upstreams = params.row.upstreams;
+      this.addRule.workMode = params.row.workMode;
+
       this.addRule.responseHeaders =
         params.row.responseHeaders == null
           ? null
@@ -930,7 +971,7 @@ export default {
     deleteMockRule: async function (params) {
       this.assignMockRuleData(params);
 
-      if (params.row.workMode == "UPSTREAM") {
+      if (params.row.workMode == "UPSTREAM" || params.row.workMode == 'INTERNAL_FORWARD') {
         this.showUpstreamMode = true;
       }
 
@@ -942,7 +983,7 @@ export default {
       this.modalTitle = "修改Mock规则";
       this.addRuleModal = true;
 
-      if (params.row.workMode == "UPSTREAM") {
+      if (params.row.workMode == "UPSTREAM"|| params.row.workMode == 'INTERNAL_FORWARD') {
         this.showUpstreamMode = true;
       } else {
         this.showUpstreamMode = false;
@@ -954,7 +995,7 @@ export default {
 
       this.modalTitle = "根据已有规则创建Mock规则";
 
-      if (params.row.workMode == "UPSTREAM") {
+      if (params.row.workMode == "UPSTREAM"|| params.row.workMode == 'INTERNAL_FORWARD') {
         this.showUpstreamMode = true;
       } else {
         this.showUpstreamMode = false;
@@ -973,6 +1014,8 @@ export default {
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
 
       let postBody = lodash.cloneDeep(this.addRule);
+
+      this.$log.debug(postBody);
 
       postBody.responseHeaders = JSON.parse(postBody.responseHeaders);
 
@@ -1035,11 +1078,7 @@ export default {
 </script>
 
 <style scoped>
-.modalInputLabel {
-  width: 110px;
-  padding: 10px;
-  display: inline-block;
-}
+
 
 p {
   text-align: left;
