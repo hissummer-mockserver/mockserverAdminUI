@@ -3,7 +3,7 @@
     <Divider>Eureka Mock Rule 管理</Divider>
     <Input class="input" v-model="eurekaServerAddress" placeholder="Eureka Server Address" style="width: 300px" />
     <Input class="input" v-model="serviceName" placeholder="Service Name" style="width: 300px" />
-    <Button class="button" type="primary" @click="queryMockRules()">查询</Button>
+    <Button class="button" type="primary" @click="queryMockRulesByButton()">查询</Button>
     <Button class="button" type="primary" @click="addMockRule()">添加</Button>
     <noticeinformation ref="noticeinformation"></noticeinformation>
     <!--Mock 规则列表表格 -->
