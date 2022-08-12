@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import App from './App.vue'
-
 import VueLogger from 'vuejs-logger';
 const isProduction = process.env.NODE_ENV === 'production';
  

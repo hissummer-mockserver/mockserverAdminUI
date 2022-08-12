@@ -88,7 +88,7 @@
 
       <div>
         <span class="modalInputLabel">请求Host:</span>
-        <Input v-model="addRule.host" placeholder="要添加的HostName,为空或者* 则表示会匹配所有HostName" style="width: 400px" />
+        <Input v-model="addRule.host" placeholder="要添加的HostName,为空或者* 则表示会匹配所有HostName， 不要使用下划线_" style="width: 400px" />
       </div>
       <div>
         <span class="modalInputLabel">工作模式:</span>
@@ -841,6 +841,12 @@ export default {
       else uri = this.server + "/xxxxhissummerxxxx/api/updateRule" + "";
 
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
+
+
+      if(this.addRule.host.includes('_')){
+        this.$refs.noticeinformation.showalert("error", "添加/修改失败，域名不能含有下划线。");
+        return;
+      }
 
       if (this.addRule.workMode == "INTERNAL_FORWARD") {
         if (
