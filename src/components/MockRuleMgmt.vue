@@ -61,6 +61,7 @@
 
     <Modal width="1024px" :mask-closable="false" v-model="querylogModal" title="请求日志">
       <div style="text-align: left; line-break: anywhere">
+        <Button class="button" type="primary" @click="queryRequestlogs(this.querylogByUri,this.querylogByHostName)">刷新</Button>
         <Table border :columns="requestlogcolumns" :data="requestlogdata"></Table>
         <Page class="page" :total="requestlogTotalSize" :current="requestlogPageNumber" show-total show-sizer
           :page-size-opts="[7, 10, 15]" :page-size="7" @on-change="changeRequestLogPageNumber($event)"

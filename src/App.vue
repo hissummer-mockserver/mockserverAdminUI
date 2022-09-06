@@ -82,6 +82,7 @@ Vue.component("reuserpassword", reuserpassword);
 const store = new Vuex.Store({
     state: {
         server: "http://localhost:8081",
+        //server: "http://172.16.2.39:80",
         standalone: false
     },
     getters: {
