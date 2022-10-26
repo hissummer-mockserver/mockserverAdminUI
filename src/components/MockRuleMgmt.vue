@@ -58,10 +58,12 @@
 
       <div slot="footer"></div>
     </Modal>
-
+    <!--请求日志modal-->
     <Modal width="1024px" :mask-closable="false" v-model="querylogModal" title="请求日志">
       <div style="text-align: left; line-break: anywhere">
-        <Button class="button" type="primary" @click="queryRequestlogs(this.querylogByUri,this.querylogByHostName)">刷新</Button>
+        <Input class="input" v-model="requestUriInQueryRequestLog" placeholder="实际请求的URI" style="width: 300px" />
+        <Button class="button" type="primary"
+          @click="queryRequestlogsWithInputUri()">刷新</Button>
         <Table border :columns="requestlogcolumns" :data="requestlogdata"></Table>
         <Page class="page" :total="requestlogTotalSize" :current="requestlogPageNumber" show-total show-sizer
           :page-size-opts="[7, 10, 15]" :page-size="7" @on-change="changeRequestLogPageNumber($event)"
@@ -69,6 +71,7 @@
       </div>
       <div slot="footer"></div>
     </Modal>
+    <!--请求日志modal-->
 
     <!-- start of the add modal -->
     <Modal width="600px" :mask-closable="false" v-model="addRuleModal" :title="modalTitle" @on-ok="addOk"
@@ -89,7 +92,8 @@
 
       <div>
         <span class="modalInputLabel">请求Host:</span>
-        <Input v-model="addRule.host" placeholder="要添加的HostName,为空或者* 则表示会匹配所有HostName， 不要使用下划线_" style="width: 400px" />
+        <Input v-model="addRule.host" placeholder="要添加的HostName,为空或者* 则表示会匹配所有HostName， 不要使用下划线_"
+          style="width: 400px" />
       </div>
       <div>
         <span class="modalInputLabel">工作模式:</span>
@@ -191,6 +195,7 @@ export default {
   },
   data() {
     return {
+      requestUriInQueryRequestLog: '',
       conditionRules: { show: false },
       ifShowConditionalRuleMgmtModal: false, //是否展示条件规则管理弹窗标志位
       isAddCategory: true,
@@ -409,6 +414,11 @@ export default {
     };
   },
   methods: {
+
+    queryRequestlogsWithInputUri: function()
+    {
+      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, this.requestUriInQueryRequestLog);
+    },
     /**
      * 打开条件规则管理弹窗
      */
@@ -698,19 +708,19 @@ export default {
     },
     changeRequestLogPageSize: async function (size) {
       this.requestlogPageSize = size;
-      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName);
+      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, '');
     },
     changeRequestLogPageNumber: async function (number) {
       this.$log.debug("------- " + number);
       this.requestlogPageNumber = number;
-      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName);
+      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, '');
     },
     queryRequestLogfirstPage: async function (mockRuleUri, mockRuleHostName) {
       this.requestlogdata = [];
       this.requestlogTotalSize = 0;
       this.requestlogPageNumber = 1;
       this.requestlogPageSize = 7;
-      this.queryRequestlogs(mockRuleUri, mockRuleHostName);
+      this.queryRequestlogs(mockRuleUri, mockRuleHostName, '');
     },
 
     changePageSize: async function (size) {
@@ -745,16 +755,21 @@ export default {
 
       this.$refs.noticeinformation.clear();
     },
-    queryRequestlogs: async function (mockRuleRri, mockRuleHostName) {
+    queryRequestlogs: async function (mockRuleRri, mockRuleHostName, requestUri) {
       this.querylogByHostName = mockRuleHostName;
       this.querylogByUri = mockRuleRri;
-      this.querylogModal = true;
+      if (!this.querylogModal) {
+        this.requestUriInQueryRequestLog = ''; 
+        requestUri = ''; 
+        this.querylogModal = true;
+      }
 
       let uri = this.server + "/xxxxhissummerxxxx/api/queryRequestLog" + "";
 
       let requestBody = {
         uri: mockRuleRri,
         hostname: mockRuleHostName,
+        requestUri: requestUri,
         pageNumber: this.requestlogPageNumber - 1,
         pageSize: this.requestlogPageSize,
       };
@@ -844,21 +859,21 @@ export default {
       //let requestBody = {'hostName':this.hostName,'uri':this.requestUri}
 
 
-      if(this.addRule.host.includes('_')){
+      if (this.addRule.host.includes('_')) {
         this.$refs.noticeinformation.showalert("error", "添加/修改失败，域名不能含有下划线。");
         return;
       }
 
       if (this.addRule.workMode == "INTERNAL_FORWARD") {
         if (
-          ( this.addRule.host == this.addRule.upstreams.nodes[0].address && this.addRule.upstreams.nodes[0].uri == this.addRule.uri)
-          
-          ||  (this.addRule.host == "*" && this.addRule.upstreams.nodes[0].uri == this.addRule.uri) ) {
+          (this.addRule.host == this.addRule.upstreams.nodes[0].address && this.addRule.upstreams.nodes[0].uri == this.addRule.uri)
+
+          || (this.addRule.host == "*" && this.addRule.upstreams.nodes[0].uri == this.addRule.uri)) {
 
 
-        await this.queryMockRules();
-        this.$refs.noticeinformation.showalert("error", "添加/修改失败，请确认内部转发是否导致了循环转发。");
-                return;
+          await this.queryMockRules();
+          this.$refs.noticeinformation.showalert("error", "添加/修改失败，请确认内部转发是否导致了循环转发。");
+          return;
         }
       }
 
@@ -948,8 +963,8 @@ p {
 .testMockRule {
   margin-top: 10px;
 }
-</style><style>
-.ivu-tooltip-inner {
+
+<style>.ivu-tooltip-inner {
   word-break: break-all;
   overflow: auto;
   max-height: 600px;

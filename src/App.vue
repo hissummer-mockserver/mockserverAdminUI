@@ -47,7 +47,7 @@
     <Divider></Divider>
     <div style="text-align:center;margin:20px;font-size:1.5em;">
         <a href="http://qa.heika.com" target="_blank">Mockserver v0.0.9</a> |
-        <a href="https://mockserver.hissummer.com/" target="_blank">使用帮助</a>
+        <!-- <a href="https://mockserver.hissummer.com/" target="_blank">使用帮助</a> -->
     </div>
 
 </div>
