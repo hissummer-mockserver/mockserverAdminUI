@@ -328,7 +328,7 @@ export default {
             return h(
               "span",
               {},
-              date.toLocaleDateString() + date.toLocaleTimeString()
+              date.toLocaleDateString() + "  "+date.toLocaleTimeString()
             );
           },
         },
@@ -417,6 +417,10 @@ export default {
 
     queryRequestlogsWithInputUri: function()
     {
+      this.requestlogdata = [];
+      this.requestlogTotalSize = 0;
+      this.requestlogPageNumber = 1;
+      this.requestlogPageSize = 7;      
       this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, this.requestUriInQueryRequestLog);
     },
     /**
@@ -521,10 +525,10 @@ export default {
           "Tooltip",
           {
             props: {
+              class:'popuptootip',
               transfer: true,
               theme: "light",
               placement: "left-start",
-              "max-width": "500",
               content: mockResponse,
             },
           },
@@ -708,19 +712,19 @@ export default {
     },
     changeRequestLogPageSize: async function (size) {
       this.requestlogPageSize = size;
-      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, '');
+      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, this.requestUriInQueryRequestLog);
     },
     changeRequestLogPageNumber: async function (number) {
       this.$log.debug("------- " + number);
       this.requestlogPageNumber = number;
-      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, '');
+      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, this.requestUriInQueryRequestLog);
     },
     queryRequestLogfirstPage: async function (mockRuleUri, mockRuleHostName) {
       this.requestlogdata = [];
       this.requestlogTotalSize = 0;
       this.requestlogPageNumber = 1;
       this.requestlogPageSize = 7;
-      this.queryRequestlogs(mockRuleUri, mockRuleHostName, '');
+      this.queryRequestlogs(mockRuleUri, mockRuleHostName, this.requestUriInQueryRequestLog);
     },
 
     changePageSize: async function (size) {
@@ -762,6 +766,9 @@ export default {
         this.requestUriInQueryRequestLog = ''; 
         requestUri = ''; 
         this.querylogModal = true;
+      }
+      else{
+        this.requestUriInQueryRequestLog = requestUri;
       }
 
       let uri = this.server + "/xxxxhissummerxxxx/api/queryRequestLog" + "";
@@ -963,10 +970,15 @@ p {
 .testMockRule {
   margin-top: 10px;
 }
+</style>
 
-<style>.ivu-tooltip-inner {
+<style>
+.ivu-tooltip-inner {
+  white-space: normal !important;
   word-break: break-all;
   overflow: auto;
+  max-width: 500px;
   max-height: 600px;
 }
 </style>
+
