@@ -328,7 +328,7 @@ export default {
             return h(
               "span",
               {},
-              date.toLocaleDateString() + date.toLocaleTimeString()
+              date.toLocaleDateString() + " "+date.toLocaleTimeString()
             );
           },
         },
