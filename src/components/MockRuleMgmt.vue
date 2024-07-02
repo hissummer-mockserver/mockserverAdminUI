@@ -328,7 +328,7 @@ export default {
             return h(
               "span",
               {},
-              date.toLocaleDateString() + "  "+date.toLocaleTimeString()
+              date.toLocaleDateString() + date.toLocaleTimeString()
             );
           },
         },
@@ -383,11 +383,11 @@ export default {
           width: 120,
           key: "workMode",
         },
-        {
-          title: "Mock响应头(Upstream模式下无效)",
-          key: "responseHeaders",
-          width: 250,
-        },
+        // {
+        //   title: "Mock响应头(Upstream模式下无效)",
+        //   key: "responseHeaders",
+        //   width: 250,
+        // },
         {
           title: "响应Headers",
           width: 150,
