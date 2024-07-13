@@ -62,6 +62,8 @@
     <Modal width="1024px" :mask-closable="false" v-model="querylogModal" title="请求日志">
       <div style="text-align: left; line-break: anywhere">
         <Input class="input" v-model="requestUriInQueryRequestLog" placeholder="实际请求的URI" style="width: 300px" />
+        <Input class="input" v-model="requestKeywordInQueryRequestLog" placeholder="请求报文关键字" style="width: 500px" />
+
         <Button class="button" type="primary"
           @click="queryRequestlogsWithInputUri()">刷新</Button>
         <Table border :columns="requestlogcolumns" :data="requestlogdata"></Table>
@@ -196,6 +198,7 @@ export default {
   data() {
     return {
       requestUriInQueryRequestLog: '',
+      requestKeywordInQueryRequestLog:'',
       conditionRules: { show: false },
       ifShowConditionalRuleMgmtModal: false, //是否展示条件规则管理弹窗标志位
       isAddCategory: true,
@@ -421,7 +424,7 @@ export default {
       this.requestlogTotalSize = 0;
       this.requestlogPageNumber = 1;
       this.requestlogPageSize = 7;      
-      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, this.requestUriInQueryRequestLog);
+      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, this.requestUriInQueryRequestLog,this.requestKeywordInQueryRequestLog);
     },
     /**
      * 打开条件规则管理弹窗
@@ -712,19 +715,19 @@ export default {
     },
     changeRequestLogPageSize: async function (size) {
       this.requestlogPageSize = size;
-      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, this.requestUriInQueryRequestLog);
+      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, this.requestUriInQueryRequestLog,this.requestKeywordInQueryRequestLog);
     },
     changeRequestLogPageNumber: async function (number) {
       this.$log.debug("------- " + number);
       this.requestlogPageNumber = number;
-      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, this.requestUriInQueryRequestLog);
+      this.queryRequestlogs(this.querylogByUri, this.querylogByHostName, this.requestUriInQueryRequestLog,this.requestKeywordInQueryRequestLog);
     },
     queryRequestLogfirstPage: async function (mockRuleUri, mockRuleHostName) {
       this.requestlogdata = [];
       this.requestlogTotalSize = 0;
       this.requestlogPageNumber = 1;
       this.requestlogPageSize = 7;
-      this.queryRequestlogs(mockRuleUri, mockRuleHostName, this.requestUriInQueryRequestLog);
+      this.queryRequestlogs(mockRuleUri, mockRuleHostName, this.requestUriInQueryRequestLog,this.requestKeywordInQueryRequestLog);
     },
 
     changePageSize: async function (size) {
@@ -759,16 +762,18 @@ export default {
 
       this.$refs.noticeinformation.clear();
     },
-    queryRequestlogs: async function (mockRuleRri, mockRuleHostName, requestUri) {
+    queryRequestlogs: async function (mockRuleRri, mockRuleHostName, requestUri,requestKeyword) {
       this.querylogByHostName = mockRuleHostName;
       this.querylogByUri = mockRuleRri;
       if (!this.querylogModal) {
         this.requestUriInQueryRequestLog = ''; 
+        this.requestKeywordInQueryRequestLog = '';
         requestUri = ''; 
         this.querylogModal = true;
       }
       else{
         this.requestUriInQueryRequestLog = requestUri;
+        this.requestKeywordInQueryRequestLog = requestKeyword;
       }
 
       let uri = this.server + "/xxxxhissummerxxxx/api/queryRequestLog" + "";
@@ -777,6 +782,7 @@ export default {
         uri: mockRuleRri,
         hostname: mockRuleHostName,
         requestUri: requestUri,
+        requestBodyKeyword:requestKeyword,
         pageNumber: this.requestlogPageNumber - 1,
         pageSize: this.requestlogPageSize,
       };
