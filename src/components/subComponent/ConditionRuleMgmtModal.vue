@@ -55,7 +55,20 @@
     <!-- start of the add condition rule modal -->
     <Modal width="750px" :mask-closable="false" v-model="showAddConditionRuleModal" title="添加或更新条件规则" @on-ok="addOk"
       @on-cancel="addCancel">
+
+      
       <div class="modalElementGroup">
+        <span class="modalInputLabel">是否启用:</span>
+
+            <i-switch v-model="tobeAddedConditionRule.enable" size="large">
+                <span slot="open">On</span>
+                <span slot="close">Off</span>
+            </i-switch>
+        
+      </div>
+
+      <div class="modalElementGroup">
+
         <span class="modalInputLabel">条件组合:</span>
         <div class="modalElementGroup" v-for="(
             expression, index
@@ -220,6 +233,12 @@ export default {
           title: "Mock响应体或Upstream节点",
           render: this.renderMockResponseColumn
         },
+        
+        {
+          title: "是否启用",
+          key:"enable",
+          width:90
+        },
         {
           title: "操作",
           render: this.renderActionColumn,
@@ -275,6 +294,10 @@ export default {
     },
   },
   methods: {
+    conditionRuleChangeStatus:function(status){
+
+      this.tobeAddedConditionRule.enable = status;
+    },
     openConditionModal: function () {
       this.showAddConditionRuleModal = true;
       this.clearAddConditionFormData();
@@ -550,7 +573,9 @@ export default {
       };
       this.tobeAddedConditionRule.workMode = "MOCK";
     },
-    addCancel: async function () { },
+    addCancel: async function () { 
+      this.queryConditionRulesByMockId(this.httpConditionRuleDetails.httpMockRuleId);
+    },
     changePageNumber: async function () { },
     changePageSize: async function () { },
     addFirstNewHttpConditionRule: async function (rule) {
