@@ -64,8 +64,8 @@
         <Input class="input" v-model="requestUriInQueryRequestLog" placeholder="实际请求的URI" style="width: 300px" />
         <Input class="input" v-model="requestKeywordInQueryRequestLog" placeholder="请求报文关键字" style="width: 500px" />
 
-        <Button class="button" type="primary"
-          @click="queryRequestlogsWithInputUri()">刷新</Button>
+        <Button :disabled="queryLogSubmit" class="button" type="primary"
+          @click="queryRequestlogsWithInputUri()">{{queryLogSubmitText}}</Button>
         <Table border :columns="requestlogcolumns" :data="requestlogdata"></Table>
         <Page class="page" :total="requestlogTotalSize" :current="requestlogPageNumber" show-total show-sizer
           :page-size-opts="[7, 10, 15]" :page-size="7" @on-change="changeRequestLogPageNumber($event)"
@@ -197,6 +197,8 @@ export default {
   },
   data() {
     return {
+      queryLogSubmitText:"查询",
+      queryLogSubmit:false,
       requestUriInQueryRequestLog: '',
       requestKeywordInQueryRequestLog:'',
       conditionRules: { show: false },
@@ -787,7 +789,13 @@ export default {
         pageSize: this.requestlogPageSize,
       };
 
+      this.queryLogSubmit=true;
+      this.queryLogSubmitText="查询中,请稍等"
+
       let postresult = await this.newaxios.post(uri, requestBody);
+
+      this.queryLogSubmit=false;
+      this.queryLogSubmitText="查询"
 
       this.$log.debug(postresult);
       if (postresult.data.data != null && postresult.data.data != undefined) {
